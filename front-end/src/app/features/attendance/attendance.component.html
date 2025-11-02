@@ -1,0 +1,186 @@
+<div class="attendance-wrapper">
+  <header class="attendance-header">
+    <h2>Attendance - Weekly Overview</h2>
+    <div class="attendance-controls">
+      <label>
+        Employee:
+        <select>
+          <option>John Doe</option>
+          <option>Jane Smith</option>
+        </select>
+      </label>
+    </div>
+  </header>
+
+  <div class="attendance-table-wrap">
+    <table class="attendance-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Day</th>
+          <th>Day off</th>
+          <th>Start</th>
+          <th>End</th>
+          <th>Break (min)</th>
+          <th>Work Type</th>
+          <th>Total hrs</th>
+          <th>Note</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Monday -->
+        <tr>
+            <td>04.11.2025</td>
+            <td>Mon</td>
+            <td><input type="checkbox" class="ch-dayoff"></td>
+            <td><input type="time" value="09:00" class="inp-time"></td>
+            <td><input type="time" value="17:00" class="inp-time"></td>
+            <td><input type="number" min="0" value="30" class="inp-num"></td>
+            <td>
+            <select class="sel-type">
+                <option value="office" selected>Office</option>
+                <option value="remote">Remote</option>
+            </select>
+            </td>
+            <td class="total-hours">7.5</td>
+            <td><input type="text" placeholder="note..." class="inp-note"></td>
+            <td>
+            <!-- Dugmići za trenutni dan -->
+            <button class="btn small clock-in">Clock In</button>
+            <button class="btn small clock-out">Clock Out</button>
+            <button class="btn small break-btn">Take a break</button>
+            </td>
+        </tr>
+
+        <!-- Tuesday -->
+        <tr>
+            <td>05.11.2025</td>
+            <td>Tue</td>
+            <td><input type="checkbox" class="ch-dayoff"></td>
+            <td><input type="time" value="09:00" class="inp-time" disabled></td>
+            <td><input type="time" value="17:00" class="inp-time" disabled></td>
+            <td><input type="number" min="0" value="30" class="inp-num" disabled></td>
+            <td>
+            <select class="sel-type" disabled>
+                <option value="office">Office</option>
+                <option value="remote">Remote</option>
+            </select>
+            </td>
+            <td class="total-hours">0</td>
+            <td><input type="text" placeholder="Day off" class="inp-note" disabled></td>
+            <td>
+            <!-- Dugme za day off -->
+            <button class="btn small leave-btn">Request Leave</button>
+            </td>
+        </tr>
+
+        <!-- Wednesday -->
+        <tr>
+          <td>06.11.2025</td>
+          <td>Wed</td>
+          <td><input type="checkbox" class="ch-dayoff"></td>
+          <td><input type="time" value="09:00" class="inp-time"></td>
+          <td><input type="time" value="16:45" class="inp-time"></td>
+          <td><input type="number" min="0" value="30" class="inp-num"></td>
+          <td>
+            <select class="sel-type">
+              <option value="office">Office</option>
+              <option value="remote" selected>Remote</option>
+            </select>
+          </td>
+          <td class="total-hours">7.25</td>
+          <td><input type="text" placeholder="note..." class="inp-note"></td>
+          <td>
+            <!-- Dugme za day off -->
+            <button class="btn small leave-btn">Request Leave</button>
+          </td>
+        </tr>
+
+        <!-- Thursday -->
+        <tr>
+          <td>07.11.2025</td>
+          <td>Thu</td>
+          <td><input type="checkbox" class="ch-dayoff"></td>
+          <td><input type="time" value="09:00" class="inp-time"></td>
+          <td><input type="time" value="17:00" class="inp-time"></td>
+          <td><input type="number" min="0" value="30" class="inp-num"></td>
+          <td>
+            <select class="sel-type">
+              <option value="office" selected>Office</option>
+              <option value="remote">Remote</option>
+            </select>
+          </td>
+          <td class="total-hours">7.5</td>
+          <td><input type="text" placeholder="note..." class="inp-note"></td>
+          <td>
+            <!-- Dugme za day off -->
+            <button class="btn small leave-btn">Request Leave</button>
+          </td>
+        </tr>
+
+        <!-- Friday -->
+        <tr>
+          <td>08.11.2025</td>
+          <td>Fri</td>
+          <td><input type="checkbox" class="ch-dayoff"></td>
+          <td><input type="time" value="09:00" class="inp-time"></td>
+          <td><input type="time" value="17:00" class="inp-time"></td>
+          <td><input type="number" min="0" value="30" class="inp-num"></td>
+          <td>
+            <select class="sel-type">
+              <option value="office">Office</option>
+              <option value="remote" selected>Remote</option>
+            </select>
+          </td>
+          <td class="total-hours">7.5</td>
+          <td><input type="text" placeholder="note..." class="inp-note"></td>
+          <td>
+            <!-- Dugme za day off -->
+            <button class="btn small leave-btn">Request Leave</button>
+          </td>
+        </tr>
+
+        <!-- Saturday (Day off) -->
+        <tr class="muted">
+          <td>09.11.2025</td>
+          <td>Sat</td>
+          <td><input type="checkbox" class="ch-dayoff" checked></td>
+          <td><input type="time" disabled class="inp-time"></td>
+          <td><input type="time" disabled class="inp-time"></td>
+          <td><input type="number" disabled class="inp-num"></td>
+          <td>
+            <select disabled class="sel-type">
+              <option>Office</option>
+            </select>
+          </td>
+          <td class="total-hours">0</td>
+          <td><input type="text" disabled class="inp-note" placeholder="Day off"></td>
+<!--<td> Dugme za day off
+            <button class="btn small leave-btn">Request Leave</button>
+            </td>-->
+        </tr>
+
+        <!-- Sunday (Day off) -->
+        <tr class="muted">
+          <td>10.11.2025</td>
+          <td>Sun</td>
+          <td><input type="checkbox" class="ch-dayoff" checked></td>
+          <td><input type="time" disabled class="inp-time"></td>
+          <td><input type="time" disabled class="inp-time"></td>
+          <td><input type="number" disabled class="inp-num"></td>
+          <td>
+            <select disabled class="sel-type">
+              <option>Office</option>
+            </select>
+          </td>
+          <td class="total-hours">0</td>
+          <td><input type="text" disabled class="inp-note" placeholder="Day off"></td>
+          <!--<td> Dugme za day off
+            <button class="btn small leave-btn">Request Leave</button>
+            </td>-->
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

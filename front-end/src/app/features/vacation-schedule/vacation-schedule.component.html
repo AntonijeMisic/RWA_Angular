@@ -1,0 +1,20 @@
+<div class="vacation-container">
+  <div class="months-grid">
+    <div class="month-card" *ngFor="let month of months">
+      <div class="month-header">{{ month.name }} {{ currentYear }}</div>
+      <div class="week-days">
+        <div *ngFor="let day of weekDays">{{ day }}</div>
+      </div>
+      <div class="days-grid">
+        <div
+          *ngFor="let day of month.days"
+          [class.day-disabled]="day.isPast"
+          [class.day-selected]="day.selected"
+          (click)="selectDay(day)"
+        >
+          {{ day.date }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,41 @@
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h2>User Board</h2>
+  </div>
+
+  <ul class="sidebar-menu">
+    <li routerLink="/home/attendance" routerLinkActive="active">
+      <i class="fas fa-home"></i> Home
+    </li>
+    <li routerLink="/home/announcements" routerLinkActive="active">
+      <i class="fas fa-bullhorn"></i> Announcements
+    </li>
+    <li routerLink="/home/vacations" routerLinkActive="active">
+      <i class="fas fa-calendar-alt"></i> Vacation Schedule
+    </li>
+    <li routerLink="/support" routerLinkActive="active">
+      <i class="fas fa-life-ring"></i> Support
+    </li>
+    <li routerLink="/settings" routerLinkActive="active">
+      <i class="fas fa-cog"></i> Settings
+    </li>
+  </ul>
+
+  <div class="sidebar-footer" (click)="onProfileClick()">
+    <div class="user-info">
+      <img
+        src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+        alt="User Avatar"
+        class="user-avatar"
+      />
+      <div>
+        <div class="user-name">John</div>
+        <div class="user-lastname">Doe</div>
+      </div>
+    </div>
+
+    <button class="logout-btn" (click)="onLogout()">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
+  </div>
+</div>

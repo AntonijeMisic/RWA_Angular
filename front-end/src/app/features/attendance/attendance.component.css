@@ -1,0 +1,178 @@
+/* attendance.component.css - color palette: #a97451, #4a2f1b, #d2b48c, #fdf9f4 */
+:root{
+  --bg: #fdf9f4;
+  --accent: #a97451;
+  --accent-dark: #8c5c3a;
+  --text: #4a2f1b;
+  --muted: #d2b48c;
+  --panel: #fffaf5;
+}
+
+*{box-sizing:border-box;font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif;}
+
+.attendance-wrapper{
+  padding:20px;
+  background:var(--bg);
+  min-height: calc(100vh - 40px);
+}
+
+/* Header */
+.attendance-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+}
+.attendance-header h2{
+  margin:0;
+  color:var(--text);
+}
+.attendance-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.attendance-controls label {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  color: #4a2f1b;
+  gap: 12px;
+}
+
+.attendance-controls select {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #d2b48c;
+  background-color: white;
+  font-size: 14px;
+}
+
+.attendance-controls select:focus {
+  border-color: #a97451;
+  outline: none;
+}
+
+/* Buttons */
+.btn{
+  background:var(--accent);
+  color:white;
+  border:none;
+  padding:8px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+}
+.btn.small{padding:6px 8px;border-radius:6px;font-size:14px}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--muted)}
+
+/* Table */
+.attendance-table-wrap{
+  margin-top: 30px;
+  overflow:auto;
+  border-radius:10px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.06);
+  background:var(--panel);
+  border:1px solid var(--muted);
+}
+.attendance-table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:920px;
+}
+.attendance-table th, .attendance-table td{
+  padding:10px 12px;
+  border-bottom:1px solid rgba(0,0,0,0.04);
+  text-align:center;
+  color:var(--text);
+  font-size:14px;
+}
+.attendance-table thead th{
+  background:#f2e2d3;
+  color:var(--text);
+  font-weight:600;
+}
+.attendance-table tbody tr.muted td{opacity:0.6;}
+
+/* Inputs */
+.inp-time, .inp-num, .inp-note, .sel-type{
+  padding:6px 8px;
+  border-radius:6px;
+  border:1px solid var(--muted);
+  font-size:14px;
+}
+.inp-note{width:150px}
+.ch-dayoff{transform:scale(1.1)}
+
+/* total hours badge */
+.total-hours{
+  font-weight:600;
+  color:var(--accent-dark);
+}
+
+/* Cards for mobile */
+.attendance-cards{display:none;gap:12px;margin-top:16px;}
+.card{
+  background:var(--panel);
+  border:1px solid var(--muted);
+  border-radius:10px;
+  padding:12px;
+  box-shadow:0 6px 16px rgba(0,0,0,0.05);
+}
+.card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.card-date{font-weight:700;color:var(--text)}
+.card-day{font-size:12px;color:var(--accent-dark)}
+.card-hours{font-weight:700;color:var(--accent)}
+.card-body{display:flex;flex-direction:column;gap:8px}
+.card-row{display:flex;gap:8px;align-items:center}
+.card-row label{display:flex;flex-direction:column;font-size:12px;color:var(--text)}
+.note-row input{width:100%}
+.card-actions{display:flex;gap:8px;justify-content:flex-end}
+
+/* Responsive: show cards on small screens, hide table */
+@media (max-width:920px){
+  .attendance-table-wrap{display:none}
+  .attendance-cards{display:flex;flex-direction:column}
+}
+
+/* small polish */
+.attendance-table td input:disabled, .attendance-table td select:disabled, .inp-note:disabled{
+  background:#faf7f3;color:#999;
+}
+
+.clock-in {
+  background-color: #4caf50;
+  color: white;
+}
+
+.clock-out {
+  background-color: #f44336;
+  color: white;
+}
+
+.break-btn {
+  background-color: #ff9800;
+  color: white;
+}
+
+.leave-btn {
+  background-color: #2196f3;
+  color: white;
+}
+
+.btn.small {
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 4px;
+  margin-right: 3px;
+}
+
+.btn.small:hover {
+  opacity: 0.85;
+  cursor: pointer;
+}
+
