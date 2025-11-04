@@ -10,19 +10,19 @@
     <li routerLink="/home/announcements" routerLinkActive="active">
       <i class="fas fa-bullhorn"></i> Announcements
     </li>
+    <li routerLink="/home/users" routerLinkActive="active">
+        <i class="fas fa-users"></i> Users
+    </li>
     <li routerLink="/home/vacations" routerLinkActive="active">
       <i class="fas fa-calendar-alt"></i> Vacation Schedule
     </li>
-    <li routerLink="/support" routerLinkActive="active">
-      <i class="fas fa-life-ring"></i> Support
-    </li>
-    <li routerLink="/settings" routerLinkActive="active">
-      <i class="fas fa-cog"></i> Settings
+    <li *ngIf="isAdmin" routerLink="/home/requests" routerLinkActive="active">
+      <i class="fas fa-inbox"></i> Requests
     </li>
   </ul>
 
-  <div class="sidebar-footer" (click)="onProfileClick()">
-    <div class="user-info">
+  <div class="sidebar-footer">
+    <div class="user-info" routerLink="/home/profile">
       <img
         src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
         alt="User Avatar"

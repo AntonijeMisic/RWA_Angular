@@ -27,9 +27,7 @@ export class AnnouncementsComponent implements OnInit {
   ngOnInit(): void {
     const role = this.authService.getUserRole();
     this.isAdmin = role?.roleName === 'Admin';
-    console.log('User role:', role);
 
-    // primer podataka
     this.announcements = [
       { title: 'Team Building Event', message: 'Join us for our annual team-building retreat next Friday at Avala Resort! All expenses covered.', date: '02 Nov 2025' },
       { title: 'New Office Opening', message: 'We’re expanding! A new branch will open in Novi Sad next month. Check the intranet for details.', date: '30 Oct 2025' },
@@ -39,16 +37,13 @@ export class AnnouncementsComponent implements OnInit {
 
   editAnnouncement(ann: Announcement) {
     console.log('Edit announcement', ann);
-    // ovde ide logika za edit
   }
 
   deleteAnnouncement(ann: Announcement) {
     console.log('Delete announcement', ann);
-    // ovde ide logika za delete
   }
 
   addAnnouncement() {
-    // Ovdje otvori modal ili navigiraj na formu za dodavanje
     console.log('Add Announcement clicked');
   }
 }

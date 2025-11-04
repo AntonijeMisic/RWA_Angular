@@ -6,6 +6,8 @@ import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { AttendanceComponent } from './features/attendance/attendance.component';
 import { AnnouncementsComponent } from './features/announcements/announcements.component';
 import { VacationScheduleComponent } from './features/vacation-schedule/vacation-schedule.component';
+import { UsersListComponent } from './features/users-list/users-list.component';
+import { ProfileComponent } from './shared/components/profile/profile.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -20,6 +22,8 @@ export const routes: Routes = [
       { path: 'attendance', component: AttendanceComponent },
       { path: 'announcements', component: AnnouncementsComponent },
       { path: 'vacations', component: VacationScheduleComponent },
+      { path: 'users', component: UsersListComponent },
+      { path: 'profile', component: ProfileComponent },
       // ostali child routovi
     ],
   },
