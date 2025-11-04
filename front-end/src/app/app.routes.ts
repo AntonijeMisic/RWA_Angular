@@ -8,6 +8,7 @@ import { AnnouncementsComponent } from './features/announcements/announcements.c
 import { VacationScheduleComponent } from './features/vacation-schedule/vacation-schedule.component';
 import { UsersListComponent } from './features/users-list/users-list.component';
 import { ProfileComponent } from './shared/components/profile/profile.component';
+import { RequestsComponent } from './features/requests/requests.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -24,6 +25,7 @@ export const routes: Routes = [
       { path: 'vacations', component: VacationScheduleComponent },
       { path: 'users', component: UsersListComponent },
       { path: 'profile', component: ProfileComponent },
+      { path: 'requests', component: RequestsComponent },
       // ostali child routovi
     ],
   },
