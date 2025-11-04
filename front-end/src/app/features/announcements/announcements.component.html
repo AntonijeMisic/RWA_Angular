@@ -1,42 +1,33 @@
 <div class="announcements-container">
   <h2 class="page-title">Company Announcements</h2>
 
+  <div *ngIf="isAdmin" class="add-announcement-wrapper">
+    <button class="btn add-btn" (click)="addAnnouncement()">
+      <i class="fas fa-plus"></i> Add Announcement
+    </button>
+  </div>
+
   <div class="announcements-grid">
-    <!-- Announcement Card 1 -->
-    <div class="announcement-card">
+    <div *ngFor="let ann of announcements" class="announcement-card">
       <div class="announcement-header">
-        <h3>Team Building Event</h3>
-        <span class="date">02 Nov 2025</span>
+        <h3>{{ ann.title }}</h3>
+        <span class="date">{{ ann.date }}</span>
       </div>
-      <p class="message">
-        Join us for our annual team-building retreat next Friday at Avala Resort! All expenses covered.
-      </p>
-      <button class="btn read-more">Read more</button>
-    </div>
+      <p class="message">{{ ann.message }}</p>
 
-    <!-- Announcement Card 2 -->
-    <div class="announcement-card">
-      <div class="announcement-header">
-        <h3>New Office Opening</h3>
-        <span class="date">30 Oct 2025</span>
-      </div>
-      <p class="message">
-        We’re expanding! A new branch will open in Novi Sad next month. Check the intranet for details.
-      </p>
-      <button class="btn read-more">Read more</button>
-    </div>
+      <!-- Dugmad u dnu kartice -->
+      <div class="card-buttons">
+        <!-- Dugme za sve korisnike -->
+        <button class="btn read-more">Read more</button>
 
-    <!-- Announcement Card 3 -->
-    <div class="announcement-card">
-      <div class="announcement-header">
-        <h3>Holiday Schedule</h3>
-        <span class="date">28 Oct 2025</span>
+        <!-- Dugmad za admina -->
+        <button *ngIf="isAdmin" class="btn edit-btn" (click)="editAnnouncement(ann)">
+          <i class="fas fa-edit"></i> Edit
+        </button>
+        <button *ngIf="isAdmin" class="btn delete-btn" (click)="deleteAnnouncement(ann)">
+          <i class="fas fa-trash"></i> Delete
+        </button>
       </div>
-      <p class="message">
-        Please check your calendars for updated national holidays and submit vacation requests early.
-      </p>
-      <button class="btn read-more">Read more</button>
     </div>
   </div>
 </div>
-

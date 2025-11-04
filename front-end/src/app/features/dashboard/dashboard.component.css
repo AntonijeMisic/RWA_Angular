@@ -5,7 +5,8 @@
 
 .dashboard-content {
   flex: 1;
-  padding: 20px;
   background-color: #fdf9f4;
   overflow-y: auto;
+  margin-left: 250px;
+  padding: 20px;
 }

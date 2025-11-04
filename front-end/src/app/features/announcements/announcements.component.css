@@ -1,7 +1,6 @@
 .announcements-container {
   padding: 40px 60px;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  max-height: 100vh;
 }
 
 .page-title {
@@ -12,14 +11,14 @@
   font-weight: 600;
 }
 
-/* --- GRID --- */
+/* GRID */
 .announcements-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 30px;
 }
 
-/* --- CARD --- */
+/* CARD */
 .announcement-card {
   background-color: white;
   border-radius: 12px;
@@ -27,12 +26,11 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   border: 1px solid #e3d5c0;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
-  cursor: pointer;
-  min-height: 260px;
+  min-height: 300px;
 
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* ovo gura dugme na dno */
+  justify-content: space-between;
 }
 
 .announcement-card:hover {
@@ -40,7 +38,7 @@
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
-/* --- HEADER --- */
+/* HEADER */
 .announcement-header {
   display: flex;
   justify-content: space-between;
@@ -60,33 +58,100 @@
   font-weight: 500;
 }
 
-/* --- TEXT --- */
+/* TEXT */
 .message {
   font-size: 15px;
   color: #5a4635;
   margin-bottom: 20px;
   line-height: 1.5;
-  flex-grow: 1; /* zauzme prostor izmedju headera i dugmeta */
+  flex-grow: 1;
 }
 
-/* --- BUTTON --- */
+/* DUGME KORISNIKA */
 .btn.read-more {
-  background-color: #a97451;
+  background-color: #a97451; /* tvoja standardna boja */
   color: white;
   border: none;
   border-radius: 6px;
   padding: 10px 16px;
   font-size: 15px;
-  transition: background-color 0.2s ease;
   width: 100%;
-  margin-top: auto; /* obavezno da ostane pri dnu */
+  margin-top: auto;
 }
 
 .btn.read-more:hover {
   background-color: #8c5c3a;
 }
 
-/* --- RESPONSIVE --- */
+/* DUGMAD ZA ADMINA */
+.card-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn.edit-btn {
+  background-color: #f0ad4e; /* drugačija boja */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 15px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.btn.edit-btn:hover {
+  background-color: #ec971f;
+}
+
+/* --- Admin Delete dugme --- */
+.btn.delete-btn {
+  background-color: #d9534f; /* crvena */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 15px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.btn.delete-btn:hover {
+  background-color: #c9302c;
+}
+
+.add-announcement-wrapper {
+  margin-bottom: 25px;
+  text-align: right; /* da bude na desnoj strani */
+}
+
+.btn.add-btn {
+  background-color: #5cb85c; /* zelena boja */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.btn.add-btn:hover {
+  background-color: #4cae4c;
+}
+
+/* RESPONSIVE */
 @media (max-width: 1100px) {
   .announcements-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -95,6 +160,6 @@
 
 @media (max-width: 700px) {
   .announcements-grid {
-    grid-template-columns: 1fr; /* svaka kartica zauzima ceo red */
+    grid-template-columns: 1fr;
   }
 }

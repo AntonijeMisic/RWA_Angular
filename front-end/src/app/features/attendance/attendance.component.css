@@ -176,3 +176,35 @@
   cursor: pointer;
 }
 
+/* Povećamo visinu redova */
+.attendance-table th, .attendance-table td {
+  padding: 16px 12px; /* sa 10px na 16px */
+  font-size: 15px;    /* sa 14px na 15px */
+}
+
+/* Dugmići veći */
+.btn.small {
+  padding: 8px 12px; /* sa 4px 8px na 8px 12px */
+  font-size: 14px;   /* sa 12px na 14px */
+  border-radius: 6px; /* malo više za izgled */
+  margin-right: 4px;
+}
+
+/* Hover efekat */
+.btn.small:hover {
+  opacity: 0.9;
+}
+
+/* Checkbox veći */
+.ch-dayoff {
+  transform: scale(1.3); /* sa 1.1 na 1.3 */
+}
+
+/* Opcionalno: da total-hours više iskače */
+.total-hours {
+  font-weight: 700;
+  color: var(--accent-dark);
+  font-size: 15px;
+}
+
+

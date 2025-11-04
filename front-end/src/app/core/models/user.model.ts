@@ -1,6 +1,6 @@
 export interface UserRole {
   userRoleId: number;
-  name: string;
+  roleName: string;
 }
 
 export interface UserPosition {

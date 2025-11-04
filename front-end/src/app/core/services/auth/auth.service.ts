@@ -25,6 +25,7 @@ export class AuthService {
   }
 
   saveAuthData(user: User, accessToken: string, refreshToken: string) {
+    console.log('Saving auth data for user:', user);
     localStorage.setItem(environment.userKey, JSON.stringify(user));
     localStorage.setItem(environment.accessTokenKey, accessToken);
     localStorage.setItem(environment.refreshTokenKey, refreshToken);
@@ -45,6 +46,7 @@ export class AuthService {
 
   getUserRole(): UserRole | null {
     const user = this.getUser();
+    console.log('Retrieved user for role check:', user);
     return user?.userRole ?? null;
   }
 
