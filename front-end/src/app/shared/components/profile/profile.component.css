@@ -1,0 +1,67 @@
+.profile-wrapper {
+  padding: 30px 40px;
+  background: var(--bg);
+  min-height: calc(100vh - 40px);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.profile-wrapper h2 {
+  font-size: 28px;
+  color: var(--text);
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-row label {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.form-row input,
+.form-row select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--muted);
+  font-size: 14px;
+  outline: none;
+}
+
+.form-row input:focus,
+.form-row select:focus {
+  border-color: var(--accent);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.btn.save-btn {
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn.save-btn:hover {
+  background-color: var(--accent-dark);
+}

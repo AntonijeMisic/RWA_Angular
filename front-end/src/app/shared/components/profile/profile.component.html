@@ -1,1 +1,48 @@
-<p>profile.component works!</p>
+<div class="profile-wrapper">
+  <h2>{{ isNewUser ? 'Add New User' : 'Edit Profile' }}</h2>
+
+  <form [formGroup]="profileForm" (ngSubmit)="save()" class="profile-form">
+    <div class="form-row">
+      <label>First Name</label>
+      <input type="text" formControlName="firstName">
+    </div>
+
+    <div class="form-row">
+      <label>Last Name</label>
+      <input type="text" formControlName="lastName">
+    </div>
+
+    <div class="form-row">
+      <label>Email</label>
+      <input type="email" formControlName="email">
+    </div>
+
+    <div class="form-row">
+      <label>Role</label>
+      <select formControlName="userRoleId">
+        <option *ngFor="let role of userRoles" [value]="role.userRoleId">{{ role.roleName }}</option>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <label>Position</label>
+      <select formControlName="userPositionId">
+        <option *ngFor="let pos of userPositions" [value]="pos.userPositionId">{{ pos.userPositionName }}</option>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <label>Start Date</label>
+      <input type="date" formControlName="startDate">
+    </div>
+
+    <div class="form-row">
+      <label>End Date</label>
+      <input type="date" formControlName="endDate">
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn save-btn">{{ isNewUser ? 'Create' : 'Update' }}</button>
+    </div>
+  </form>
+</div>

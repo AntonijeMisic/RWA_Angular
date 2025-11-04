@@ -22,20 +22,20 @@
   </ul>
 
   <div class="sidebar-footer">
-    <div class="user-info" routerLink="/home/profile">
+    <div class="user-info" [routerLink]="['/home/profile', currentUser.userId]">
       <img
         src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
         alt="User Avatar"
         class="user-avatar"
       />
       <div>
-        <div class="user-name">John</div>
-        <div class="user-lastname">Doe</div>
+        <div class="user-name">{{ currentUser.firstName }}</div>
+        <div class="user-lastname">{{ currentUser.lastName }}</div>
       </div>
     </div>
 
     <button class="logout-btn" (click)="onLogout()">
       <i class="fas fa-sign-out-alt"></i> Logout
     </button>
-  </div>
+    </div>
 </div>

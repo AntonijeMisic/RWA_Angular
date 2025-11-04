@@ -24,6 +24,7 @@ export const routes: Routes = [
       { path: 'announcements', component: AnnouncementsComponent },
       { path: 'vacations', component: VacationScheduleComponent },
       { path: 'users', component: UsersListComponent },
+      { path: 'profile/:id', component: ProfileComponent },
       { path: 'profile', component: ProfileComponent },
       { path: 'requests', component: RequestsComponent },
       // ostali child routovi

@@ -18,7 +18,7 @@
       </select>
 
       <!-- Samo admin vidi dugme Add User -->
-      <button *ngIf="isAdmin" class="btn add-btn">
+      <button *ngIf="isAdmin" class="btn add-btn" [routerLink]="['/home/profile']">
         <i class="fas fa-plus"></i> Add User
       </button>
     </div>
