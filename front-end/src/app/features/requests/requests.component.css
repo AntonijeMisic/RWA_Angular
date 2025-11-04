@@ -1,0 +1,142 @@
+.requests-wrapper {
+  padding: 20px 40px;
+  background: var(--bg);
+  min-height: calc(100vh - 40px);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Header */
+.requests-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+}
+.requests-header h2{
+  margin:0;
+  color:var(--text);
+}
+
+/* FILTERS */
+.requests-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.filter-input, .filter-select {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--muted);
+  font-size: 14px;
+  min-width: 200px;
+}
+
+/* CARDS */
+.requests-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* manja udaljenost između kartica */
+}
+
+.request-card {
+  background-color: white;
+  border-radius: 10px;
+  padding: 16px; /* manji padding */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); /* blaži shadow */
+  border: 1px solid #e3d5c0; /* braonkasta linija */
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.request-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+}
+
+/* HEADER */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.employee-name {
+  font-size: 16px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.status {
+  padding: 2px 8px;
+  border-radius: 6px;
+  color: white;
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.status.pending {
+  background-color: #f0ad4e;
+}
+
+.status.approved {
+  background-color: #4caf50;
+}
+
+.status.rejected {
+  background-color: #f44336;
+}
+
+/* BODY */
+.card-body p {
+  margin: 2px 0;
+  color: var(--text);
+  font-size: 14px;
+}
+
+/* ACTIONS */
+.card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* BUTTONS */
+.btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  min-width: 80px;
+  transition: background-color 0.2s ease;
+  color: white;
+}
+
+.btn:hover {
+  opacity: 0.85;
+}
+
+.approve-btn {
+  background-color: #4caf50;
+}
+
+.reject-btn {
+  background-color: #f44336;
+}
+
+/* RESPONSIVE */
+@media (max-width: 700px) {
+  .requests-wrapper {
+    padding: 20px;
+  }
+}

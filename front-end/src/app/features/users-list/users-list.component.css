@@ -1,0 +1,140 @@
+:root {
+  --bg: #fdf9f4;
+  --accent: #a97451;
+  --accent-dark: #8c5c3a;
+  --text: #4a2f1b;
+  --muted: #d2b48c;
+  --panel: #fffaf5;
+}
+
+.userlist-wrapper {
+  padding: 20px;
+  background: var(--bg);
+  min-height: calc(100vh - 40px);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Header i filteri */
+.userlist-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.userlist-header h2 {
+  margin: 0;
+  color: var(--text);
+}
+
+.userlist-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-input {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--muted);
+  font-size: 14px;
+  min-width: 200px;
+}
+
+.filter-select {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--muted);
+  font-size: 14px;
+  background-color: white;
+}
+
+/* Dugmad */
+.btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 16px; /* veća dugmad */
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px; /* razmak između ikonice i teksta */
+  min-width: 90px;
+  transition: background-color 0.2s ease;
+}
+
+.btn:hover {
+  background: var(--accent-dark);
+}
+
+.add-btn {
+  background-color: #4caf50;
+}
+
+.add-btn:hover {
+  background-color: #3e8e41;
+}
+
+.edit-btn {
+  background-color: #2196f3;
+}
+
+.edit-btn:hover {
+  background-color: #1976d2;
+}
+
+.delete-btn {
+  background-color: #f44336;
+}
+
+.delete-btn:hover {
+  background-color: #d32f2f;
+}
+
+/* Razmak između dugmadi unutar iste ćelije */
+.userlist-table td .btn + .btn {
+  margin-left: 8px;
+}
+
+/* Tabela */
+.userlist-table-wrap {
+  overflow: auto;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+  background: var(--panel);
+  border: 1px solid var(--muted);
+}
+
+.userlist-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.userlist-table th,
+.userlist-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  text-align: center;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.userlist-table thead th {
+  background: #f2e2d3;
+  font-weight: 600;
+}
+
+.userlist-table tbody tr:hover {
+  background-color: #faf3ed;
+}
+
+/* Responsive podešavanja za mobilni prikaz */
+@media (max-width: 920px) {
+  .userlist-table-wrap {
+    overflow-x: scroll;
+  }
+}

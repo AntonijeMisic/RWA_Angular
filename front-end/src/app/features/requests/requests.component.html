@@ -1,1 +1,41 @@
-<p>requests.component works!</p>
+<div class="requests-wrapper">
+  <header class="requests-header">
+    <h2>Leave Requests</h2>
+
+    <div class="requests-filters">
+      <input type="text" placeholder="Search employee..." class="filter-input" [(ngModel)]="searchText">
+      <select class="filter-select" [(ngModel)]="filterStatus">
+        <option value="">All Status</option>
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+      </select>
+    </div>
+  </header>
+
+  <div class="requests-cards">
+    <div *ngFor="let req of leaveRequests | filter:searchText | statusFilter:filterStatus" class="request-card">
+      <div class="card-header">
+        <div class="employee-name">{{ req.user.firstName }} {{ req.user.lastName }}</div>
+        <div class="status" [ngClass]="req.requestStatus.requestStatusName.toLowerCase()">{{ req.requestStatus.requestStatusName }}</div>
+      </div>
+
+      <div class="card-body">
+        <p><strong>Leave Type:</strong> {{ req.leaveType.leaveTypeName }}</p>
+        <p><strong>Start:</strong> {{ req.startDate | date:'dd.MM.yyyy' }}</p>
+        <p><strong>End:</strong> {{ req.endDate | date:'dd.MM.yyyy' }}</p>
+        <p><strong>Request Date:</strong> {{ req.requestDate | date:'dd.MM.yyyy' }}</p>
+        <p><strong>Note:</strong> {{ req.note || '-' }}</p>
+      </div>
+
+      <div class="card-actions" *ngIf="isAdmin">
+        <button class="btn approve-btn" (click)="approveRequest(req)">
+          <i class="fas fa-check"></i> Approve
+        </button>
+        <button class="btn reject-btn" (click)="rejectRequest(req)">
+          <i class="fas fa-times"></i> Reject
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

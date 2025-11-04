@@ -5,7 +5,7 @@ export interface UserRole {
 
 export interface UserPosition {
   userPositionId: number;
-  name: string;
+  userPositionName: string;
 }
 
 export interface User {
