@@ -2,38 +2,62 @@
   <h2>{{ isNewUser ? 'Add New User' : 'Edit Profile' }}</h2>
 
   <form [formGroup]="profileForm" (ngSubmit)="save()" class="profile-form">
+
     <div class="form-row">
       <label>First Name</label>
       <input type="text" formControlName="firstName">
+      <div class="error" *ngIf="profileForm.controls.firstName.invalid && profileForm.controls.firstName.touched">
+        First Name is required.
+      </div>
     </div>
 
     <div class="form-row">
       <label>Last Name</label>
       <input type="text" formControlName="lastName">
+      <div class="error" *ngIf="profileForm.controls.lastName.invalid && profileForm.controls.lastName.touched">
+        Last Name is required.
+      </div>
     </div>
 
     <div class="form-row">
       <label>Email</label>
       <input type="email" formControlName="email">
+      <div class="error" *ngIf="profileForm.controls.email.invalid && profileForm.controls.email.touched">
+        <span *ngIf="profileForm.controls.email.errors?.['required']">Email is required.</span>
+        <span *ngIf="profileForm.controls.email.errors?.['email']">Invalid email address.</span>
+      </div>
     </div>
 
+    <!-- Role -->
     <div class="form-row">
       <label>Role</label>
       <select formControlName="userRoleId">
-        <option *ngFor="let role of userRoles" [value]="role.userRoleId">{{ role.roleName }}</option>
+        <option value="" disabled>Select Role</option>
+        <option *ngFor="let role of userRoles" [ngValue]="role.userRoleId">{{ role.roleName }}</option>
       </select>
+      <div class="error" *ngIf="profileForm.controls.userRoleId.invalid && profileForm.controls.userRoleId.touched">
+        Role is required.
+      </div>
     </div>
 
+    <!-- Position -->
     <div class="form-row">
       <label>Position</label>
       <select formControlName="userPositionId">
-        <option *ngFor="let pos of userPositions" [value]="pos.userPositionId">{{ pos.userPositionName }}</option>
+        <option value="" disabled>Select Position</option>
+        <option *ngFor="let pos of userPositions" [ngValue]="pos.userPositionId">{{ pos.userPositionName }}</option>
       </select>
+      <div class="error" *ngIf="profileForm.controls.userPositionId.invalid && profileForm.controls.userPositionId.touched">
+        Position is required.
+      </div>
     </div>
 
     <div class="form-row">
       <label>Start Date</label>
       <input type="date" formControlName="startDate">
+      <div class="error" *ngIf="profileForm.controls.startDate.invalid && profileForm.controls.startDate.touched">
+        Start Date is required.
+      </div>
     </div>
 
     <div class="form-row">

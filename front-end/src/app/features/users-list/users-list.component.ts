@@ -1,7 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { User } from '../../core/models/user.model';
 import { RouterModule } from '@angular/router';
+import { LookupsService } from '../../core/services/lookups/lookups.service';
+import { UserPosition, UserRole } from '../../core/models/lookups.model';
+import { AuthService } from '../../core/services/auth/auth.service';
 
 @Component({
   selector: 'app-users-list.component',
@@ -9,7 +12,29 @@ import { RouterModule } from '@angular/router';
   templateUrl: './users-list.component.html',
   styleUrl: './users-list.component.css'
 })
-export class UsersListComponent {
+export class UsersListComponent implements OnInit {
+
+  lookupService = inject(LookupsService);
+  authService = inject(AuthService);
+
+  userRoles: UserRole[] = [];
+  userPositions: UserPosition[] = [];
+  isAdmin: boolean = false;
+
+  ngOnInit(): void {
+    const lookups = this.lookupService.getLookups();
+    console.log(lookups);
+    if (lookups) {
+      this.userRoles = lookups.userRoles;
+      this.userPositions = lookups.userPositions;
+    }
+    console.log(this.userRoles, this.userPositions);
+    //ce ucitamo i user-e ali to preko ngrx store-a kasnije
+
+    const role = this.authService.getUserRole();
+    this.isAdmin = role?.roleName === 'Admin';
+  }
+
   users: User[] = [
     {
       userId: 1,
@@ -36,6 +61,4 @@ export class UsersListComponent {
       endDate: null
     }
   ];
-
-  isAdmin = true; // simulacija za prikaz Add User dugmeta
 }

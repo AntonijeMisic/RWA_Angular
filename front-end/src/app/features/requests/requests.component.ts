@@ -1,10 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { LeaveRequest, LeaveType, RequestStatus } from '../../core/models/leaveRequest.model';
+import { Component, inject, OnInit } from '@angular/core';
+import { LeaveRequest, } from '../../core/models/leaveRequest.model';
 import { User } from '../../core/models/user.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FilterPipe } from './filter.pipe';
 import { StatusFilterPipe } from './status-filter.pipe';
+import { LeaveType, RequestStatus } from '../../core/models/lookups.model';
+import { LookupsService } from '../../core/services/lookups/lookups.service';
+import { AuthService } from '../../core/services/auth/auth.service';
 
 @Component({
   selector: 'app-requests.component',
@@ -13,12 +16,20 @@ import { StatusFilterPipe } from './status-filter.pipe';
   styleUrl: './requests.component.css'
 })
 export class RequestsComponent implements OnInit {
+
+  private lookupService = inject(LookupsService);
+  private authService = inject(AuthService);
+
   leaveRequests: LeaveRequest[] = [];
-  isAdmin = true; // samo za test
+  requestStatuses: RequestStatus[] = [];
+  isAdmin = false;
   searchText: string = '';
-  filterStatus: string = ''; // <-- dodaj ovo
+  filterStatus: number | null = null;
 
   ngOnInit(): void {
+    const role = this.authService.getUserRole();
+    this.isAdmin = role?.roleName === 'Admin';
+    this.requestStatuses = this.lookupService.getLookups().requestStatuses;
     const admin: User = {
       userId: 1,
       firstName: 'Admin',
@@ -46,8 +57,8 @@ export class RequestsComponent implements OnInit {
     const leaveAnnual: LeaveType = { leaveTypeId: 1, leaveTypeName: 'Annual Leave' };
     const leaveSick: LeaveType = { leaveTypeId: 2, leaveTypeName: 'Sick Leave' };
 
-    const statusPending: RequestStatus = { statusId: 1, requestStatusName: 'Pending' };
-    const statusApproved: RequestStatus = { statusId: 2, requestStatusName: 'Approved' };
+    const statusPending: RequestStatus = { requestStatusId: 1, requestStatusName: 'Pending' };
+    const statusApproved: RequestStatus = { requestStatusId: 2, requestStatusName: 'Approved' };
 
     this.leaveRequests = [
       {

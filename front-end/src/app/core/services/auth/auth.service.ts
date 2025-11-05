@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { User, UserRole } from '../../models/user.model';
+import { User } from '../../models/user.model';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
+import { UserRole } from '../../models/lookups.model';
 
 interface LoginResponse {
   user: User;

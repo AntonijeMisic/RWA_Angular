@@ -5,10 +5,10 @@ import { LeaveRequest } from '../../core/models/leaveRequest.model';
   name: 'statusFilter'
 })
 export class StatusFilterPipe implements PipeTransform {
-  transform(requests: LeaveRequest[], status: string): LeaveRequest[] {
+  transform(requests: LeaveRequest[], statusId: number | null): LeaveRequest[] {
     if (!requests) return [];
-    if (!status) return requests;
-    status = status.toLowerCase();
-    return requests.filter(req => req.requestStatus.requestStatusName.toLowerCase() === status);
+    if (!statusId) return requests;
+
+    return requests.filter(req => req.requestStatus.requestStatusId === statusId);
   }
 }

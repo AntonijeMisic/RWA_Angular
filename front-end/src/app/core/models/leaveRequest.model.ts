@@ -1,13 +1,5 @@
+import { LeaveType, RequestStatus } from './lookups.model';
 import { User } from './user.model';
-
-export interface LeaveType {
-  leaveTypeId: number;
-  leaveTypeName: string;
-}
-export interface RequestStatus {
-  statusId: number;
-  requestStatusName: string;
-}
 
 export interface LeaveRequest {
   requestId: number;

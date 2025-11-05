@@ -6,18 +6,18 @@
       <input type="text" placeholder="Search by name or email..." class="filter-input" />
       <select class="filter-select">
         <option value="">All Roles</option>
-        <option value="Admin">Admin</option>
-        <option value="Employee">Employee</option>
-        <option value="Manager">Manager</option>
-      </select>
-      <select class="filter-select">
-        <option value="">All Positions</option>
-        <option value="Developer">Developer</option>
-        <option value="Designer">Designer</option>
-        <option value="HR">HR</option>
+        <option *ngFor="let role of userRoles" [value]="role.roleName">
+          {{ role.roleName }}
+        </option>
       </select>
 
-      <!-- Samo admin vidi dugme Add User -->
+      <select class="filter-select">
+        <option value="">All Positions</option>
+        <option *ngFor="let pos of userPositions" [value]="pos.userPositionName">
+          {{ pos.userPositionName }}
+        </option>
+      </select>
+
       <button *ngIf="isAdmin" class="btn add-btn" [routerLink]="['/home/profile']">
         <i class="fas fa-plus"></i> Add User
       </button>

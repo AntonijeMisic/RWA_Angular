@@ -1,12 +1,4 @@
-export interface UserRole {
-  userRoleId: number;
-  roleName: string;
-}
-
-export interface UserPosition {
-  userPositionId: number;
-  userPositionName: string;
-}
+import { UserPosition, UserRole } from "./lookups.model";
 
 export interface User {
   userId: number;

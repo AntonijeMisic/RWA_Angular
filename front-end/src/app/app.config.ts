@@ -1,10 +1,18 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import { provideAppInitializer, inject, ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+import { LookupsService } from './core/services/lookups/lookups.service';
+import { provideHttpClient, withFetch } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
-
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideAppInitializer(async () => {
+      const lookupsService = inject(LookupsService);
+      const lookups = await firstValueFrom(lookupsService.getAllLookups());
+      lookupsService.setLookups(lookups);
+    }),
+    provideHttpClient(withFetch()),
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes)

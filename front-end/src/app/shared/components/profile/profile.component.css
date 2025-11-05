@@ -1,7 +1,7 @@
 .profile-wrapper {
   padding: 30px 40px;
   background: var(--bg);
-  min-height: calc(100vh - 40px);
+  max-height: calc(100vh - 40px);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   max-width: 600px;
   margin: 0 auto;
@@ -38,11 +38,28 @@
   border: 1px solid var(--muted);
   font-size: 14px;
   outline: none;
+  transition: border-color 0.2s;
 }
 
 .form-row input:focus,
 .form-row select:focus {
   border-color: var(--accent);
+}
+
+.form-row select {
+  cursor: pointer;
+  background-color: white;
+}
+
+.error {
+  color: red;
+  font-size: 0.8rem;
+  margin-top: 2px;
+}
+
+/* Dodato za bolju vidljivost disabled/placeholder opcije u selectu */
+select option[value=""] {
+  color: #999;
 }
 
 .form-actions {
@@ -52,16 +69,28 @@
 }
 
 .btn.save-btn {
-  background-color: var(--accent);
+  background-color: #a97451; /* glavna boja */
   color: white;
-  border: none;
-  padding: 10px 20px;
+  border: 1px solid #e3d5c0; /* braonkasti border */
+  border-radius: 12px; /* zaobljeni uglovi */
+  padding: 12px 24px; /* veće i preglednije */
   font-size: 16px;
-  border-radius: 8px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s;
 }
 
 .btn.save-btn:hover {
-  background-color: var(--accent-dark);
+  background-color: #8c5c3a; /* tamnija nijansa */
+}
+
+/* Responsive: manji ekrani */
+@media (max-width: 480px) {
+  .profile-wrapper {
+    padding: 20px;
+    max-width: 100%;
+  }
+  .btn.save-btn {
+    width: 100%;
+  }
 }
