@@ -18,7 +18,6 @@ export class AuthService {
   constructor(private http: HttpClient, private router: Router) {}
 
   login(email: string, password: string) {
-    console.log('Attempting login for:', email);
     return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, {
       email,
       password,

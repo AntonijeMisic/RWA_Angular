@@ -44,8 +44,8 @@
           <td>{{ user.userRole.roleName }}</td>
           <td>{{ user.userPosition.userPositionName }}</td>
           <td>
-            <button class="btn small edit-btn"><i class="fas fa-edit"></i> Edit </button>
-            <button class="btn small delete-btn"><i class="fas fa-trash"></i> Delete </button>
+            <button *ngIf="isAdmin" class="btn small edit-btn"><i class="fas fa-edit"></i> Edit </button>
+            <button *ngIf="isAdmin" class="btn small delete-btn"><i class="fas fa-trash"></i> Delete </button>
           </td>
         </tr>
       </tbody>

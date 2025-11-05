@@ -28,7 +28,19 @@
       </div>
     </div>
 
-    <!-- Role -->
+    <div class="form-row">
+      <label>Password</label>
+      <input
+        type="password"
+        formControlName="password"
+        [placeholder]="isNewUser ? 'Enter password' : '••••••'"
+      >
+      <div class="error" *ngIf="profileForm.controls.password.invalid && profileForm.controls.password.touched">
+        <span *ngIf="profileForm.controls.password.errors?.['required']">Password is required.</span>
+        <span *ngIf="profileForm.controls.password.errors?.['minlength']">Password must be at least 6 characters.</span>
+      </div>
+    </div>
+
     <div class="form-row">
       <label>Role</label>
       <select formControlName="userRoleId">
