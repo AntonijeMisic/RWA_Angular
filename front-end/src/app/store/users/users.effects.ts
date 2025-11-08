@@ -11,11 +11,23 @@ export class UsersEffects {
     private actions$ = inject(Actions);
     private userService = inject(UserService);
 
+    setCurrentUser$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(UsersActions.setCurrentUser),
+            exhaustMap(({ userId }) =>
+                this.userService.getUserById(userId).pipe(
+                    map(user => UsersActions.setCurrentUserSuccess({ user })),
+                    catchError(error => of(UsersActions.setCurrentUserFailure({ error })))
+                )
+            )
+        )
+    );
+
     loadUsers$ = createEffect(() =>
         this.actions$.pipe(
             ofType(UsersActions.loadUsers),
-            exhaustMap(() =>
-                this.userService.getAllUsers().pipe(
+            exhaustMap((action) =>
+                this.userService.getAllUsers(action.filter ?? {}).pipe(
                     map((users) => UsersActions.loadUsersSuccess({ users })),
                     catchError((error) => of(UsersActions.loadUsersFailure({ error })))
                 )

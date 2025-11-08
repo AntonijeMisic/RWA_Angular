@@ -10,7 +10,7 @@ import { AppState } from '../../../store/app.state';
 import { Store } from '@ngrx/store';
 import * as UsersActions from '../../../store/users/users.actions';
 import { filter, map, switchMap, tap, of, take } from 'rxjs';
-import { selectUserById } from '../../../store/users/users.selectors';
+import { selectSelectedUser, selectUserById } from '../../../store/users/users.selectors';
 
 type UserForm = {
   firstName: FormControl<string | null>;
@@ -62,21 +62,16 @@ export class ProfileComponent implements OnInit {
 
     const currentUserId = this.userService.getUserId();
     if (currentUserId) {
-      const currentUserSignal = this.store.selectSignal(selectUserById(currentUserId));
-
-      effect(() => {
-        const user = currentUserSignal();
-        this.currentUser.set(user ?? null);
-        this.isAdmin.set(!!user && user.userRole?.roleName === 'Admin');
-
-        if (user) {
-          if (user.userRole?.roleName === 'Admin') {
-            this.profileForm.controls['userRoleId'].enable();
-          } else {
-            this.profileForm.controls['userRoleId'].disable();
-          }
-        }
-      });
+      this.userService.getUserById(currentUserId).subscribe(user => {
+        console.log('Fetched current user:', user);
+        console.log(user.userRole?.roleName === 'Admin');
+            this.isAdmin.set(user.userRole?.roleName === 'Admin');
+            if (user.userRole?.roleName === 'Admin') {
+              this.profileForm.controls['userRoleId'].enable();
+            } else {
+              this.profileForm.controls['userRoleId'].disable();
+            }
+          });
     }
   }
 
@@ -99,13 +94,11 @@ export class ProfileComponent implements OnInit {
             return of(null);
           }
 
-          return this.store.select(selectUserById(userId)).pipe(
-            tap(user => {
-              if (!user) {
-                this.store.dispatch(UsersActions.loadUserById({ userId }));
-              }
-            }),
-            filter(user => !!user)
+          // dispatchuj svaki put novi userId
+          this.store.dispatch(UsersActions.loadUserById({ userId }));
+
+          return this.store.select(selectSelectedUser).pipe(
+            filter(user => !!user && user.userId === userId) // čekaj da se učita novi user
           );
         })
       )

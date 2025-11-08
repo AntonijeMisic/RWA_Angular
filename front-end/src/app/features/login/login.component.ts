@@ -1,9 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
+import { Store } from '@ngrx/store';
+import * as UsersActions from '../../store/users/users.actions';
+import { AppState } from '../../store/app.state';
 
 export interface Login {
   email: string;
@@ -32,6 +35,8 @@ export class LoginComponent {
 
   errorMessage: string | null = null;
 
+  private store: Store<AppState> = inject(Store<AppState>);
+
   constructor(private authService: AuthService, private router: Router) { }
 
   onSubmit() {
@@ -47,6 +52,7 @@ export class LoginComponent {
           res.access_token,
           res.refresh_token
         );
+        this.store.dispatch(UsersActions.setCurrentUser({ userId: res.user.userId! }));
         this.router.navigate(['/home']);
       },
       error: (err) => {

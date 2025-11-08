@@ -1,7 +1,43 @@
 import { createAction, props } from '@ngrx/store';
 import { User } from '../../core/models/user.model';
+import { UserFilterDto } from '../../core/dtos/userFilter.dto.';
 
-export const loadUsers = createAction('[Users] Load Users');
+// --- Set current user (async style) ---
+export const setCurrentUser = createAction(
+  '[Users] Set Current User',
+  props<{ userId: number }>()
+);
+
+export const setCurrentUserSuccess = createAction(
+  '[Users] Set Current User Success',
+  props<{ user: User }>()
+);
+
+export const setCurrentUserFailure = createAction(
+  '[Users] Set Current User Failure',
+  props<{ error: any }>()
+);
+
+// --- Update current user (async style) ---
+export const updateCurrentUser = createAction(
+  '[Users] Update Current User',
+  props<{ user: Partial<User> }>()
+);
+
+export const updateCurrentUserSuccess = createAction(
+  '[Users] Update Current User Success',
+  props<{ user: User }>()
+);
+
+export const updateCurrentUserFailure = createAction(
+  '[Users] Update Current User Failure',
+  props<{ error: any }>()
+);
+
+export const loadUsers = createAction(
+  '[Users] Load Users',
+  props<{ filter?: UserFilterDto }>()
+);
 export const loadUsersSuccess = createAction('[Users] Load Users Success', props<{ users: User[] }>());
 export const loadUsersFailure = createAction('[Users] Load Users Failure', props<{ error: any }>()); // ne znam da li ce error biti any ili neki specificniji tip
 

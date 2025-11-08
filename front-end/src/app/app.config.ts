@@ -9,13 +9,16 @@ import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { provideStore } from '@ngrx/store';
 import { UsersEffects } from './store/users/users.effects';
 import { usersReducer } from './store/users/users.reducer';
+import { AppInitService } from './app.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideAppInitializer(async () => {
       const lookupsService = inject(LookupsService);
+      const appService = inject(AppInitService);
       const lookups = await firstValueFrom(lookupsService.getAllLookups());
       lookupsService.setLookups(lookups);
+      appService.initCurrentUser();
     }),
     provideHttpClient(withFetch()),
     provideBrowserGlobalErrorListeners(),

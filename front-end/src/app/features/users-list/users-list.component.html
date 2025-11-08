@@ -2,26 +2,48 @@
   <header class="userlist-header">
     <h2>User Management</h2>
 
-    <div class="userlist-filters">
-      <input type="text" placeholder="Search by name or email..." class="filter-input" />
-      <select class="filter-select">
-        <option value="">All Roles</option>
-        <option *ngFor="let role of userRoles" [value]="role.roleName">
+    <form [formGroup]="filterForm" class="userlist-filters" (ngSubmit)="onFilter()">
+      <input
+        type="text"
+        placeholder="First Name"
+        class="filter-input"
+        formControlName="firstName"
+      />
+
+      <input
+        type="text"
+        placeholder="Last Name"
+        class="filter-input"
+        formControlName="lastName"
+      />
+
+      <input
+        type="text"
+        placeholder="Email"
+        class="filter-input"
+        formControlName="email"
+      />
+
+      <select class="filter-select" formControlName="userRoleId">
+        <option [ngValue]="null">All Roles</option>
+        <option *ngFor="let role of userRoles" [ngValue]="role.userRoleId">
           {{ role.roleName }}
         </option>
       </select>
 
-      <select class="filter-select">
-        <option value="">All Positions</option>
-        <option *ngFor="let pos of userPositions" [value]="pos.userPositionName">
-          {{ pos.userPositionName }}
-        </option>
+      <select class="filter-select" formControlName="userPositionId">
+        <option [ngValue]="null">All Positions</option>
+        <option *ngFor="let pos of userPositions" [ngValue]="pos.userPositionId">{{ pos.userPositionName }}</option>
       </select>
 
-      <button *ngIf="isAdmin()" class="btn add-btn" [routerLink]="['/home/profile']">
+      <button type="submit" class="btn add-btn">
+        <i class="fas fa-search"></i> Search
+      </button>
+
+      <button *ngIf="isAdmin()" type="button" class="btn add-btn" [routerLink]="['/home/profile']">
         <i class="fas fa-plus"></i> Add User
       </button>
-    </div>
+    </form>
   </header>
 
   <div class="userlist-table-wrap">

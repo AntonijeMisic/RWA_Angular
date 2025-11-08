@@ -5,10 +5,8 @@ import { Store } from '@ngrx/store';
 
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { AppState } from '../../../store/app.state';
-import { selectUserById } from '../../../store/users/users.selectors';
-import * as UsersActions from '../../../store/users/users.actions';
+import { selectCurrentUser } from '../../../store/users/users.selectors';
 import { User } from '../../../core/models/user.model';
-import { UserService } from '../../../core/services/user/user.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -23,22 +21,17 @@ export class SidebarComponent {
   isAdmin = signal(false);
 
   private authService = inject(AuthService);
-  private userService = inject(UserService);
   private store = inject(Store<AppState>);
 
   constructor() {
-    const userId = this.userService.getUserId();
-    if (!userId) return;
-
-    const userSignal = this.store.selectSignal(selectUserById(userId));
+    const currentUserSignal = this.store.selectSignal(selectCurrentUser);
 
     effect(() => {
-      const user = userSignal();
-      if (!user) {
-        this.store.dispatch(UsersActions.loadUserById({ userId }));
+      const user = currentUserSignal();
+      if(user) {
+        this.currentUser.set(user);
+        this.isAdmin.set(!!user && user.userRole?.roleName === 'Admin');
       }
-      this.currentUser.set(user ?? null);
-      this.isAdmin.set(!!user && user.userRole?.roleName === 'Admin');
     });
   }
 

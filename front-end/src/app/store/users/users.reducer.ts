@@ -7,18 +7,53 @@ export interface UsersState {
   loading: boolean;
   error: any;
   selectedUser?: User | null;
+  currentUser?: User | null;
 }
 
 export const initialState: UsersState = {
   users: [],
   loading: false,
   error: null,
-  selectedUser: null
+  selectedUser: null,
+  currentUser: null
 };
 
 export const usersReducer = createReducer(
   initialState,
 
+  on(UsersActions.setCurrentUser, (state) => ({
+    ...state,
+    loading: true,
+    error: null
+  })),
+  on(UsersActions.setCurrentUserSuccess, (state, { user }) => ({
+    ...state,
+    currentUser: user,
+    users: state.users.map(u => u.userId === user.userId ? user : u),
+    loading: false
+  })),
+  on(UsersActions.setCurrentUserFailure, (state, { error }) => ({
+    ...state,
+    loading: false,
+    error
+  })),
+
+  on(UsersActions.updateCurrentUser, (state) => ({
+    ...state,
+    loading: true,
+    error: null
+  })),
+  on(UsersActions.updateCurrentUserSuccess, (state, { user }) => ({
+    ...state,
+    currentUser: user,
+    users: state.users.map(u => u.userId === user.userId ? user : u),
+    loading: false
+  })),
+  on(UsersActions.updateCurrentUserFailure, (state, { error }) => ({
+    ...state,
+    loading: false,
+    error
+  })),
   // --- Load all users ---
   on(UsersActions.loadUsers, (state) => ({
     ...state,
@@ -42,14 +77,11 @@ export const usersReducer = createReducer(
     loading: true,
     error: null
   })),
-  on(UsersActions.loadUserByIdSuccess, (state, { user }) => ({
+ on(UsersActions.loadUserByIdSuccess, (state, { user }) => ({
     ...state,
-    users: [
-      ...state.users.filter(u => u.userId !== user.userId), // delete old version if  exists
-      user // add/ update with new one
-    ],
+    selectedUser: user,
     loading: false
-  })),
+})),
   on(UsersActions.loadUserByIdFailure, (state, { error }) => ({
     ...state,
     loading: false,
@@ -79,11 +111,22 @@ export const usersReducer = createReducer(
     loading: true,
     error: null
   })),
-  on(UsersActions.updateUserSuccess, (state, { user }) => ({
-    ...state,
-    users: state.users.map(u => u.userId === user.userId ? user : u),
-    loading: false
-  })),
+  on(UsersActions.updateUserSuccess, (state, { user }) => {
+    // Update user u users listi
+    const updatedUsers = state.users.map(u => u.userId === user.userId ? user : u);
+
+    // Ažuriraj selectedUser i currentUser ako su isti kao taj user
+    const updatedSelectedUser = state.selectedUser && state.selectedUser.userId === user.userId ? user : state.selectedUser;
+    const updatedCurrentUser = state.currentUser && state.currentUser.userId === user.userId ? user : state.currentUser;
+
+    return {
+      ...state,
+      users: updatedUsers,
+      selectedUser: updatedSelectedUser,
+      currentUser: updatedCurrentUser,
+      loading: false
+    };
+  }),
   on(UsersActions.updateUserFailure, (state, { error }) => ({
     ...state,
     loading: false,
@@ -98,6 +141,7 @@ export const usersReducer = createReducer(
   on(UsersActions.deleteUserSuccess, (state, { userId }) => ({
     ...state,
     users: state.users.filter(u => u.userId !== userId),
+    selectedUser: state.selectedUser?.userId === userId ? null : state.selectedUser,
     loading: false
   })),
   on(UsersActions.deleteUserFailure, (state, { error }) => ({
