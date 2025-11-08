@@ -8,23 +8,18 @@
   </div>
 
   <div class="announcements-grid">
-    <div *ngFor="let ann of announcements" class="announcement-card">
+    <div *ngFor="let ann of announcements$ | async" class="announcement-card">
       <div class="announcement-header">
         <h3>{{ ann.title }}</h3>
-        <span class="date">{{ ann.date }}</span>
       </div>
       <p class="message">{{ ann.message }}</p>
 
-      <!-- Dugmad u dnu kartice -->
       <div class="card-buttons">
-        <!-- Dugme za sve korisnike -->
         <button class="btn read-more">Read more</button>
-
-        <!-- Dugmad za admina -->
-        <button *ngIf="isAdmin" class="btn edit-btn" (click)="editAnnouncement(ann)">
+        <button *ngIf="isAdmin()" class="btn edit-btn" (click)="editAnnouncement(ann)">
           <i class="fas fa-edit"></i> Edit
         </button>
-        <button *ngIf="isAdmin" class="btn delete-btn" (click)="deleteAnnouncement(ann)">
+        <button *ngIf="isAdmin()" class="btn delete-btn" (click)="deleteAnnouncement(ann)">
           <i class="fas fa-trash"></i> Delete
         </button>
       </div>

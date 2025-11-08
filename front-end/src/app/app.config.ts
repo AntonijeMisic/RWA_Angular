@@ -10,6 +10,8 @@ import { provideStore } from '@ngrx/store';
 import { UsersEffects } from './store/users/users.effects';
 import { usersReducer } from './store/users/users.reducer';
 import { AppInitService } from './app.service';
+import { AnnouncementsEffects } from './store/announcements/announcements.effects';
+import { announcementsReducer } from './store/announcements/announcements.reducer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -24,8 +26,11 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideStore({ users: usersReducer }),
+    provideStore({
+      users: usersReducer,
+      announcements: announcementsReducer
+    }),
     provideStoreDevtools({ maxAge: 25 }),
-    provideEffects([UsersEffects]),
+    provideEffects([UsersEffects, AnnouncementsEffects]),
   ]
 };

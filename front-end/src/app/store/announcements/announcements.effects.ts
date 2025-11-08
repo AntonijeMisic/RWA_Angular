@@ -1,0 +1,73 @@
+import { Injectable, inject } from '@angular/core';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
+import * as AnnouncementsActions from './announcements.actions';
+import { catchError, map, mergeMap, of } from 'rxjs';
+import { AnnouncementService } from '../../core/services/announcements/announcements.service';
+
+@Injectable()
+export class AnnouncementsEffects {
+  private actions$ = inject(Actions);
+  private announcementService = inject(AnnouncementService);
+
+  load$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnouncementsActions.loadAnnouncements),
+      mergeMap(() =>
+        this.announcementService.getAllAnnouncements().pipe(
+          map(announcements =>
+            AnnouncementsActions.loadAnnouncementsSuccess({ announcements })
+          ),
+          catchError(error =>
+            of(AnnouncementsActions.loadAnnouncementsFailure({ error }))
+          )
+        )
+      )
+    )
+  );
+
+  create$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnouncementsActions.createAnnouncement),
+      mergeMap(({ announcement }) =>
+        this.announcementService.create(announcement).pipe(
+          map(newAnn =>
+            AnnouncementsActions.createAnnouncementSuccess({ announcement: newAnn })
+          ),
+          catchError(error =>
+            of(AnnouncementsActions.createAnnouncementFailure({ error }))
+          )
+        )
+      )
+    )
+  );
+
+  update$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnouncementsActions.updateAnnouncement),
+      mergeMap(({ announcement }) =>
+        this.announcementService.update(announcement).pipe(
+          map(updated =>
+            AnnouncementsActions.updateAnnouncementSuccess({ announcement: updated })
+          ),
+          catchError(error =>
+            of(AnnouncementsActions.updateAnnouncementFailure({ error }))
+          )
+        )
+      )
+    )
+  );
+
+  delete$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnouncementsActions.deleteAnnouncement),
+      mergeMap(({ id }) =>
+        this.announcementService.delete(id).pipe(
+          map(() => AnnouncementsActions.deleteAnnouncementSuccess({ id })),
+          catchError(error =>
+            of(AnnouncementsActions.deleteAnnouncementFailure({ error }))
+          )
+        )
+      )
+    )
+  );
+}

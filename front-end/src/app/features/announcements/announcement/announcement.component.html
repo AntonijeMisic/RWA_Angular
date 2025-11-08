@@ -1,0 +1,31 @@
+<div class="profile-wrapper">
+  <h2>Create Announcement</h2>
+  <form [formGroup]="announcementForm" (ngSubmit)="saveAnnouncement()" class="profile-form">
+
+    <div class="form-row">
+      <label for="title">Title</label>
+      <input id="title" formControlName="title" type="text" />
+      <div class="error" *ngIf="announcementForm.get('title')?.invalid && announcementForm.get('title')?.touched">
+        Title is required (max 200 chars)
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label for="message">Message</label>
+      <textarea id="message" formControlName="message" rows="4"></textarea>
+      <div class="error" *ngIf="announcementForm.get('message')?.invalid && announcementForm.get('message')?.touched">
+        Message is required
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label for="visible_until">Visible Until</label>
+      <input id="visible_until" type="date" formControlName="visible_until" />
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn save-btn">Save Announcement</button>
+    </div>
+
+  </form>
+</div>

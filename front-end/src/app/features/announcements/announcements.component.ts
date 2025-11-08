@@ -1,47 +1,49 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { UserService } from '../../core/services/user/user.service';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { Router } from '@angular/router';
 
-interface Announcement {
-  title: string;
-  message: string;
-  date: string;
-  createdBy?: string;
-}
+import { AppState } from '../../store/app.state';
+import { Announcement } from '../../core/models/announcement.model';
+import { selectAllAnnouncements } from '../../store/announcements/announcements.selectors';
+import * as AnnouncementsActions from '../../store/announcements/announcements.actions';
+import { selectCurrentUser } from '../../store/users/users.selectors';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-announcements',
   templateUrl: './announcements.component.html',
   styleUrls: ['./announcements.component.css'],
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   standalone: true
 })
 export class AnnouncementsComponent implements OnInit {
 
-  userService = inject(UserService);
-  announcements: Announcement[] = [];
-  isAdmin: boolean = false;
+  private store = inject(Store<AppState>);
+  private router = inject(Router);
+
+  announcements$: Observable<Announcement[]> = this.store.select(selectAllAnnouncements);
+  isAdmin = signal(false);
 
   ngOnInit(): void {
-    const role = this.userService.getUserRole();
-    this.isAdmin = role?.roleName === 'Admin';
+    this.store.dispatch(AnnouncementsActions.loadAnnouncements());
 
-    this.announcements = [
-      { title: 'Team Building Event', message: 'Join us for our annual team-building retreat next Friday at Avala Resort! All expenses covered.', date: '02 Nov 2025' },
-      { title: 'New Office Opening', message: 'We’re expanding! A new branch will open in Novi Sad next month. Check the intranet for details.', date: '30 Oct 2025' },
-      { title: 'Holiday Schedule', message: 'Please check your calendars for updated national holidays and submit vacation requests early.', date: '28 Oct 2025' }
-    ];
-  }
-
-  editAnnouncement(ann: Announcement) {
-    console.log('Edit announcement', ann);
-  }
-
-  deleteAnnouncement(ann: Announcement) {
-    console.log('Delete announcement', ann);
+    this.store.select(selectCurrentUser).subscribe(user => {
+      this.isAdmin.set(!!user && user.userRole?.roleName === 'Admin');
+    });
   }
 
   addAnnouncement() {
-    console.log('Add Announcement clicked');
+    this.router.navigate(['/home/announcement']);
+  }
+
+  editAnnouncement(ann: Announcement) {
+    this.router.navigate(['/home/announcement', ann.announcementId]);
+  }
+
+  deleteAnnouncement(ann: Announcement) {
+    if (!confirm(`Are you sure you want to delete "${ann.title}"?`)) return;
+    this.store.dispatch(AnnouncementsActions.deleteAnnouncement({ id: ann.announcementId }));
   }
 }
