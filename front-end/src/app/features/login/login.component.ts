@@ -40,11 +40,10 @@ export class LoginComponent {
       return;
     }
     const loginData: Login = this.loginForm.getRawValue();
-    console.log('Login attempt with data:', loginData);
     this.authService.login(loginData.email, loginData.password).subscribe({
       next: (res) => {
         this.authService.saveAuthData(
-          res.user,
+          res.user.userId!,
           res.access_token,
           res.refresh_token
         );

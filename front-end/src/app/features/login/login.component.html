@@ -1,6 +1,12 @@
 <div class="login-container">
   <div class="login-box">
     <h2 class="title">Sign in</h2>
+
+    <!-- Global error message -->
+    <div *ngIf="errorMessage" class="error global-error">
+      {{ errorMessage }}
+    </div>
+
     <form (ngSubmit)="onSubmit()" [formGroup]="loginForm" novalidate>
       <div class="form-group">
         <label>Email</label>

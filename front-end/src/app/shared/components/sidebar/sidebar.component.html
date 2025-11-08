@@ -16,21 +16,21 @@
     <li routerLink="/home/vacations" routerLinkActive="active">
       <i class="fas fa-calendar-alt"></i> Vacation Schedule
     </li>
-    <li *ngIf="isAdmin" routerLink="/home/requests" routerLinkActive="active">
+    <li *ngIf="isAdmin()" routerLink="/home/requests" routerLinkActive="active">
       <i class="fas fa-inbox"></i> Requests
     </li>
   </ul>
 
   <div class="sidebar-footer">
-    <div class="user-info" [routerLink]="['/home/profile', currentUser.userId]">
+    <div *ngIf="currentUser() as user" class="user-info" [routerLink]="['/home/profile', user.userId]">
       <img
         src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
         alt="User Avatar"
         class="user-avatar"
       />
       <div>
-        <div class="user-name">{{ currentUser.firstName }}</div>
-        <div class="user-lastname">{{ currentUser.lastName }}</div>
+        <div class="user-name">{{ user.firstName }}</div>
+        <div class="user-lastname">{{ user.lastName }}</div>
       </div>
     </div>
 

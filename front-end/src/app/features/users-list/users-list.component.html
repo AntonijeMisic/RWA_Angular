@@ -18,14 +18,15 @@
         </option>
       </select>
 
-      <button *ngIf="isAdmin" class="btn add-btn" [routerLink]="['/home/profile']">
+      <button *ngIf="isAdmin()" class="btn add-btn" [routerLink]="['/home/profile']">
         <i class="fas fa-plus"></i> Add User
       </button>
     </div>
   </header>
 
   <div class="userlist-table-wrap">
-    <table class="userlist-table">
+    <div *ngIf="loading$ | async" class="spinner"></div>
+    <table *ngIf="!(loading$ | async)" class="userlist-table">
       <thead>
         <tr>
           <th>First Name</th>
@@ -37,15 +38,15 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let user of users">
+        <tr *ngFor="let user of users$ | async">
           <td>{{ user.firstName }}</td>
           <td>{{ user.lastName }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.userRole.roleName }}</td>
           <td>{{ user.userPosition.userPositionName }}</td>
           <td>
-            <button *ngIf="isAdmin" class="btn small edit-btn"><i class="fas fa-edit"></i> Edit </button>
-            <button *ngIf="isAdmin" class="btn small delete-btn"><i class="fas fa-trash"></i> Delete </button>
+            <button *ngIf="isAdmin()" class="btn small edit-btn" [routerLink]="['/home/profile', user.userId]"><i class="fas fa-edit"></i> Edit </button>
+            <button *ngIf="isAdmin()" class="btn small delete-btn" (click)="onDelete(user.userId!)"><i class="fas fa-trash"></i> Delete </button>
           </td>
         </tr>
       </tbody>

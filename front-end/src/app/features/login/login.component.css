@@ -83,3 +83,10 @@ input.invalid {
   font-size: 12px;
   color: #cc0000;
 }
+
+.global-error {
+  color: #f44336;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  text-align: center;
+}

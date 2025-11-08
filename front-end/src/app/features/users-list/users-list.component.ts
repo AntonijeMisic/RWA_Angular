@@ -1,66 +1,62 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, effect, inject, OnInit, signal } from '@angular/core';
 import { User } from '../../core/models/user.model';
 import { RouterModule } from '@angular/router';
 import { LookupsService } from '../../core/services/lookups/lookups.service';
 import { UserPosition, UserRole } from '../../core/models/lookups.model';
 import { AuthService } from '../../core/services/auth/auth.service';
+import { Store, StoreModule } from '@ngrx/store';
+import * as UsersActions from '../../store/users/users.actions';
+import { selectAllUsers, selectUserById, selectUsersLoading } from '../../store/users/users.selectors';
+import { Observable } from 'rxjs';
+import { AppState } from '../../store/app.state';
+import { UserService } from '../../core/services/user/user.service';
 
 @Component({
   selector: 'app-users-list.component',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, StoreModule],
   templateUrl: './users-list.component.html',
   styleUrl: './users-list.component.css'
 })
 export class UsersListComponent implements OnInit {
 
   lookupService = inject(LookupsService);
-  authService = inject(AuthService);
+  userService = inject(UserService);
+  store = inject(Store<AppState>);
+
+  users$!: Observable<User[]>;
+  loading$!: Observable<boolean>;
 
   userRoles: UserRole[] = [];
   userPositions: UserPosition[] = [];
-  isAdmin: boolean = false;
+  isAdmin = signal(false); // signal umesto booleana
+
+  constructor() {
+    const userId = this.userService.getUserId();
+    if (!userId) return;
+    const userSignal = this.store.selectSignal(selectUserById(userId));
+    effect(() => {
+      const user = userSignal();
+      if (!user) {
+        this.store.dispatch(UsersActions.loadUserById({ userId }));
+      }
+      this.isAdmin.set(!!user && user.userRole?.roleName === 'Admin');
+    });
+  }
 
   ngOnInit(): void {
     const lookups = this.lookupService.getLookups();
-    console.log(lookups);
+
     if (lookups) {
       this.userRoles = lookups.userRoles;
       this.userPositions = lookups.userPositions;
     }
-    console.log(this.userRoles, this.userPositions);
-    //ce ucitamo i user-e ali to preko ngrx store-a kasnije
-
-    const role = this.authService.getUserRole();
-    this.isAdmin = role?.roleName === 'Admin';
+    this.store.dispatch(UsersActions.loadUsers());
+    this.users$ = this.store.select(selectAllUsers);
+    this.loading$ = this.store.select(selectUsersLoading);
   }
 
-  users: User[] = [
-    {
-      userId: 1,
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john.doe@company.com',
-      password  : 'johndoe123',
-      userRoleId: 1,
-      userRole: { roleName: 'Admin' } as any,
-      userPositionId: 1,
-      userPosition: { userPositionName: 'Developer' } as any,
-      startDate: new Date('2023-01-01'),
-      endDate: null
-    },
-    {
-      userId: 2,
-      firstName: 'Jane',
-      lastName: 'Smith',
-      email: 'jane.smith@company.com',
-      password  : 'janesmith123',
-      userRoleId: 2,
-      userRole: { roleName: 'Employee' } as any,
-      userPositionId: 2,
-      userPosition: { userPositionName: 'Designer' } as any,
-      startDate: new Date('2024-03-15'),
-      endDate: null
-    }
-  ];
+  onDelete(userId: number) {
+      this.store.dispatch(UsersActions.deleteUser({ userId }));
+  }
 }

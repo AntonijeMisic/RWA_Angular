@@ -1,12 +1,16 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, effect, inject, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule, formatDate } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { User, } from '../../../core/models/user.model';
-import { AuthService } from '../../../core/services/auth/auth.service';
 import { UserRole, UserPosition } from '../../../core/models/lookups.model';
 import { LookupsService } from '../../../core/services/lookups/lookups.service';
 import { UserService } from '../../../core/services/user/user.service';
+import { AppState } from '../../../store/app.state';
+import { Store } from '@ngrx/store';
+import * as UsersActions from '../../../store/users/users.actions';
+import { filter, map, switchMap, tap, of, take } from 'rxjs';
+import { selectUserById } from '../../../store/users/users.selectors';
 
 type UserForm = {
   firstName: FormControl<string | null>;
@@ -29,91 +33,136 @@ type UserForm = {
 export class ProfileComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private authService = inject(AuthService);
   private userService = inject(UserService);
   private lookupService = inject(LookupsService);
+  private store = inject(Store<AppState>);
 
   user?: User;
-  userId?: number;
+  userId?: number | null;
   isNewUser = false;
 
   userRoles: UserRole[] = [];
   userPositions: UserPosition[] = []
+  profileForm: FormGroup<UserForm>;
 
-  profileForm = new FormGroup<UserForm>({
-    firstName: new FormControl(null, Validators.required),
-    lastName: new FormControl(null, Validators.required),
-    email: new FormControl(null, { validators: [Validators.required, Validators.email] }),
-    password: new FormControl(null),
-    userRoleId: new FormControl<number | null>(null, Validators.required),
-    userPositionId: new FormControl<number | null>(null, Validators.required),
-    startDate: new FormControl<Date | null>(null, Validators.required),
-    endDate: new FormControl<Date | null>(null),
-  });
+  isAdmin = signal(false);
+  private currentUser = signal<User | null>(null);
 
-  ngOnInit(): void {
-    this.userRoles = this.lookupService.getLookups().userRoles; //mozda ce i ove stvari da idu preko store-a u ngrx kasnije
-    this.userPositions = this.lookupService.getLookups().userPositions;
+  constructor() {
+    this.profileForm = new FormGroup<UserForm>({
+      firstName: new FormControl(null, Validators.required),
+      lastName: new FormControl(null, Validators.required),
+      email: new FormControl(null, { validators: [Validators.required, Validators.email] }),
+      password: new FormControl(null),
+      userRoleId: new FormControl<number | null>(null, Validators.required),
+      userPositionId: new FormControl<number | null>(null, Validators.required),
+      startDate: new FormControl<Date | null>(null, Validators.required),
+      endDate: new FormControl<Date | null>(null),
+    });
 
-    const idParam = this.route.snapshot.params['id'];
-    this.userId = idParam ? Number(idParam) : undefined;
-    this.isNewUser = !this.userId;
+    const currentUserId = this.userService.getUserId();
+    if (currentUserId) {
+      const currentUserSignal = this.store.selectSignal(selectUserById(currentUserId));
 
-    if (this.isNewUser) {
-      this.profileForm.controls.password.setValidators(Validators.required);
-      this.profileForm.controls.password.updateValueAndValidity();
-    }
-    else {
-      const existing = this.authService.getUser();
-      if (existing) {
-        this.user = existing;
-        const { password, ...rest } = existing;
+      effect(() => {
+        const user = currentUserSignal();
+        this.currentUser.set(user ?? null);
+        this.isAdmin.set(!!user && user.userRole?.roleName === 'Admin');
 
-        this.profileForm.patchValue({
-          ...rest,
-          password: null
-        });
-      }
-      this.profileForm.controls.password.clearValidators();
-      this.profileForm.controls.password.updateValueAndValidity();
+        if (user) {
+          if (user.userRole?.roleName === 'Admin') {
+            this.profileForm.controls['userRoleId'].enable();
+          } else {
+            this.profileForm.controls['userRoleId'].disable();
+          }
+        }
+      });
     }
   }
 
-  save() {
-    if (this.profileForm.invalid) {
-      this.profileForm.markAllAsTouched();
-      return;
-    }
+  ngOnInit(): void {
+    this.userRoles = this.lookupService.getLookups().userRoles;
+    this.userPositions = this.lookupService.getLookups().userPositions;
 
-    const userData = this.profileForm.getRawValue();
+    this.route.paramMap
+      .pipe(
+        map(paramMap => paramMap.get('id')),
+        map(id => id ? Number(id) : null),
+        switchMap(userId => {
+          this.userId = userId;
+          this.isNewUser = !userId;
 
-    const payload: Partial<User> = {
-      userId: this.isNewUser ? null : this.userId!,
-      firstName: userData.firstName || '',
-      lastName: userData.lastName || '',
-      email: userData.email || '',
-      userRoleId: userData.userRoleId || 0,
-      userRole: this.userRoles.find(ur => ur.userRoleId === userData.userRoleId)!,
-      userPositionId: userData.userPositionId || 0,
-      userPosition: this.userPositions.find(up => up.userPositionId === userData.userPositionId)!,
-      startDate: userData.startDate || new Date(),
-      endDate: userData.endDate || null
-    };
+          if (this.isNewUser) {
+            this.profileForm.reset();
+            this.profileForm.controls.password.setValidators(Validators.required);
+            this.profileForm.controls.password.updateValueAndValidity();
+            return of(null);
+          }
 
-    if (userData.password) {
-      payload.password = userData.password;
-    }
+          return this.store.select(selectUserById(userId)).pipe(
+            tap(user => {
+              if (!user) {
+                this.store.dispatch(UsersActions.loadUserById({ userId }));
+              }
+            }),
+            filter(user => !!user)
+          );
+        })
+      )
+      .subscribe(user => {
+        if (user) {
+          this.user = user;
+          const { password, ...rest } = user;
+          this.profileForm.patchValue({
+            ...rest,
+            password: null
+          });
 
-    const request$ = this.isNewUser
-      ? this.userService.register(payload as User)
-      : this.userService.update(payload as User);
+          this.profileForm.controls.password.clearValidators();
+          this.profileForm.controls.password.updateValueAndValidity();
+        }
+      });
+  }
 
-    request$.subscribe({
-      next: res => {
-        console.log('Success:', res);
-        this.router.navigate(['/home/users']);
-      },
-      error: err => console.error('Error while saving:', err)
+save() {
+  if (this.profileForm.invalid) {
+    this.profileForm.markAllAsTouched();
+    return;
+  }
+
+  const userData = this.profileForm.getRawValue();
+
+  const payload: Partial<User> = {
+    userId: this.isNewUser ? null : this.userId!,
+    firstName: userData.firstName || '',
+    lastName: userData.lastName || '',
+    email: userData.email || '',
+    userRoleId: userData.userRoleId || 0,
+    userRole: this.userRoles.find(ur => ur.userRoleId === userData.userRoleId)!,
+    userPositionId: userData.userPositionId || 0,
+    userPosition: this.userPositions.find(up => up.userPositionId === userData.userPositionId)!,
+    startDate: userData.startDate || new Date(),
+    endDate: userData.endDate || null
+  };
+
+  if (userData.password) {
+    payload.password = userData.password;
+  }
+
+  if (this.isNewUser) {
+    this.store.dispatch(UsersActions.createUser({ user: payload as User }));
+  }
+  else {
+    this.store.dispatch(UsersActions.updateUser({ user: payload as User }));
+  }
+
+  this.store.select(state => state.users.loading)
+    .pipe(
+      filter(loading => loading === false),
+      take(1)
+    )
+    .subscribe(() => {
+      this.router.navigate(['/home/users']);
     });
   }
 }

@@ -1,8 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { AuthService } from '../../core/services/auth/auth.service';
 import { CommonModule } from '@angular/common';
-import { LookupsService } from '../../core/services/lookups/lookups.service';
-import { UserRole } from '../../core/models/lookups.model';
+import { UserService } from '../../core/services/user/user.service';
 
 interface Announcement {
   title: string;
@@ -20,12 +18,12 @@ interface Announcement {
 })
 export class AnnouncementsComponent implements OnInit {
 
-  authService = inject(AuthService);
+  userService = inject(UserService);
   announcements: Announcement[] = [];
   isAdmin: boolean = false;
 
   ngOnInit(): void {
-    const role = this.authService.getUserRole();
+    const role = this.userService.getUserRole();
     this.isAdmin = role?.roleName === 'Admin';
 
     this.announcements = [

@@ -1,9 +1,8 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { User } from '../../models/user.model';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
-import { UserRole } from '../../models/lookups.model';
 
 interface LoginResponse {
   user: User;
@@ -15,7 +14,9 @@ interface LoginResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  constructor(private http: HttpClient, private router: Router) {}
+
+  private http = inject(HttpClient);
+  private router = inject(Router);
 
   login(email: string, password: string) {
     return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, {
@@ -24,9 +25,8 @@ export class AuthService {
     });
   }
 
-  saveAuthData(user: User, accessToken: string, refreshToken: string) {
-    console.log('Saving auth data for user:', user);
-    localStorage.setItem(environment.userKey, JSON.stringify(user));
+  saveAuthData(userId: number, accessToken: string, refreshToken: string) {
+    localStorage.setItem(environment.userKey, JSON.stringify(userId));
     localStorage.setItem(environment.accessTokenKey, accessToken);
     localStorage.setItem(environment.refreshTokenKey, refreshToken);
   }
@@ -37,17 +37,6 @@ export class AuthService {
 
   getRefreshToken(): string | null {
     return localStorage.getItem(environment.refreshTokenKey);
-  }
-
-  getUser(): User | null {
-    const userJson = localStorage.getItem(environment.userKey);
-    return userJson ? JSON.parse(userJson) : null;
-  }
-
-  getUserRole(): UserRole | null {
-    const user = this.getUser();
-    console.log('Retrieved user for role check:', user);
-    return user?.userRole ?? null;
   }
 
   isLoggedIn(): boolean {

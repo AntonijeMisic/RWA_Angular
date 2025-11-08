@@ -4,6 +4,11 @@ import { LookupsService } from './core/services/lookups/lookups.service';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
+import { provideEffects } from '@ngrx/effects';
+import { provideStoreDevtools } from '@ngrx/store-devtools';
+import { provideStore } from '@ngrx/store';
+import { UsersEffects } from './store/users/users.effects';
+import { usersReducer } from './store/users/users.reducer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -15,6 +20,9 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withFetch()),
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes)
+    provideRouter(routes),
+    provideStore({ users: usersReducer }),
+    provideStoreDevtools({ maxAge: 25 }),
+    provideEffects([UsersEffects]),
   ]
 };

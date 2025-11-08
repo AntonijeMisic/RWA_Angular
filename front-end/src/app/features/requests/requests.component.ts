@@ -7,7 +7,7 @@ import { FilterPipe } from './filter.pipe';
 import { StatusFilterPipe } from './status-filter.pipe';
 import { LeaveType, RequestStatus } from '../../core/models/lookups.model';
 import { LookupsService } from '../../core/services/lookups/lookups.service';
-import { AuthService } from '../../core/services/auth/auth.service';
+import { UserService } from '../../core/services/user/user.service';
 
 @Component({
   selector: 'app-requests.component',
@@ -18,7 +18,7 @@ import { AuthService } from '../../core/services/auth/auth.service';
 export class RequestsComponent implements OnInit {
 
   private lookupService = inject(LookupsService);
-  private authService = inject(AuthService);
+  private userService = inject(UserService);
 
   leaveRequests: LeaveRequest[] = [];
   requestStatuses: RequestStatus[] = [];
@@ -27,7 +27,7 @@ export class RequestsComponent implements OnInit {
   filterStatus: number | null = null;
 
   ngOnInit(): void {
-    const role = this.authService.getUserRole();
+    const role = this.userService.getUserRole();
     this.isAdmin = role?.roleName === 'Admin';
     this.requestStatuses = this.lookupService.getLookups().requestStatuses;
     const admin: User = {
