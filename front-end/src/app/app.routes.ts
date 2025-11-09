@@ -10,6 +10,7 @@ import { UsersListComponent } from './features/users-list/users-list.component';
 import { ProfileComponent } from './shared/components/profile/profile.component';
 import { RequestsComponent } from './features/requests/requests.component';
 import { AnnouncementComponent } from './features/announcements/announcement/announcement.component';
+import { AdminGuard } from './core/guards/admin/admin.guard-guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -23,7 +24,8 @@ export const routes: Routes = [
       { path: '', redirectTo: 'attendance', pathMatch: 'full' },
       { path: 'attendance', component: AttendanceComponent },
       { path: 'announcements', component: AnnouncementsComponent },
-      { path: 'announcement', component: AnnouncementComponent },
+      { path: 'announcement', component: AnnouncementComponent, canActivate: [AdminGuard] },
+      { path: 'announcement/:id', component: AnnouncementComponent },
       { path: 'vacations', component: VacationScheduleComponent },
       { path: 'users', component: UsersListComponent },
       { path: 'profile/:id', component: ProfileComponent },
@@ -36,6 +38,10 @@ export const routes: Routes = [
     path: 'login',
     component: LoginComponent,
     canActivate: [redirectGuard],
-  }
+  },
+  {
+    path: '**',
+    redirectTo: '/home/attendance'
+  },
 ];
 

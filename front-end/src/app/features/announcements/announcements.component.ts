@@ -34,16 +34,15 @@ export class AnnouncementsComponent implements OnInit {
     });
   }
 
+  showAnnouncement(ann: Announcement) {
+    this.router.navigate(['/home/announcement', ann.announcementId]);
+  }
+
   addAnnouncement() {
     this.router.navigate(['/home/announcement']);
   }
 
-  editAnnouncement(ann: Announcement) {
-    this.router.navigate(['/home/announcement', ann.announcementId]);
-  }
-
   deleteAnnouncement(ann: Announcement) {
-    if (!confirm(`Are you sure you want to delete "${ann.title}"?`)) return;
     this.store.dispatch(AnnouncementsActions.deleteAnnouncement({ id: ann.announcementId }));
   }
 }

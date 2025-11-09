@@ -12,6 +12,21 @@ export const loadAnnouncementsFailure = createAction(
   props<{ error: any }>()
 );
 
+export const loadAnnouncementById = createAction(
+  '[Announcements] Load Announcement By Id',
+  props<{ id: number }>()
+);
+
+export const loadAnnouncementByIdSuccess = createAction(
+  '[Announcements] Load Announcement By Id Success',
+  props<{ announcement: Announcement }>()
+);
+
+export const loadAnnouncementByIdFailure = createAction(
+  '[Announcements] Load Announcement By Id Failure',
+  props<{ error: any }>()
+);
+
 // Create
 export const createAnnouncement = createAction(
   '[Announcements] Create',
@@ -29,7 +44,7 @@ export const createAnnouncementFailure = createAction(
 // Update
 export const updateAnnouncement = createAction(
   '[Announcements] Update',
-  props<{ announcement: Announcement }>()
+  props<{ announcement: Partial<Announcement> }>()
 );
 export const updateAnnouncementSuccess = createAction(
   '[Announcements] Update Success',

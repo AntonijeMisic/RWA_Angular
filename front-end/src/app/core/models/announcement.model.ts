@@ -5,5 +5,4 @@ export interface Announcement {
   title: string;
   message: string;
   createdBy?: User | null;
-  visible_until?: Date | null;
 }

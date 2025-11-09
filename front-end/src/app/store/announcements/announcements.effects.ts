@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import * as AnnouncementsActions from './announcements.actions';
-import { catchError, map, mergeMap, of } from 'rxjs';
+import { catchError, map, exhaustMap, of } from 'rxjs';
 import { AnnouncementService } from '../../core/services/announcements/announcements.service';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class AnnouncementsEffects {
   load$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AnnouncementsActions.loadAnnouncements),
-      mergeMap(() =>
+      exhaustMap(() =>
         this.announcementService.getAllAnnouncements().pipe(
           map(announcements =>
             AnnouncementsActions.loadAnnouncementsSuccess({ announcements })
@@ -25,10 +25,26 @@ export class AnnouncementsEffects {
     )
   );
 
+  loadAnnouncementById$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnouncementsActions.loadAnnouncementById),
+      exhaustMap(({ id }) =>
+        this.announcementService.getAnnouncementById(id).pipe(
+          map(announcement =>
+            AnnouncementsActions.loadAnnouncementByIdSuccess({ announcement })
+          ),
+          catchError(error =>
+            of(AnnouncementsActions.loadAnnouncementByIdFailure({ error }))
+          )
+        )
+      )
+    )
+  );
+
   create$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AnnouncementsActions.createAnnouncement),
-      mergeMap(({ announcement }) =>
+      exhaustMap(({ announcement }) =>
         this.announcementService.create(announcement).pipe(
           map(newAnn =>
             AnnouncementsActions.createAnnouncementSuccess({ announcement: newAnn })
@@ -44,7 +60,7 @@ export class AnnouncementsEffects {
   update$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AnnouncementsActions.updateAnnouncement),
-      mergeMap(({ announcement }) =>
+      exhaustMap(({ announcement }) =>
         this.announcementService.update(announcement).pipe(
           map(updated =>
             AnnouncementsActions.updateAnnouncementSuccess({ announcement: updated })
@@ -60,7 +76,7 @@ export class AnnouncementsEffects {
   delete$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AnnouncementsActions.deleteAnnouncement),
-      mergeMap(({ id }) =>
+      exhaustMap(({ id }) =>
         this.announcementService.delete(id).pipe(
           map(() => AnnouncementsActions.deleteAnnouncementSuccess({ id })),
           catchError(error =>

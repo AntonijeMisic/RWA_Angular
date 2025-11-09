@@ -17,6 +17,14 @@ export class AnnouncementService {
     return this.http.get<Announcement[]>(`${environment.apiUrl}/announcements`, {headers});
   }
 
+  getAnnouncementById(id: number): Observable<Announcement> {
+    const token = localStorage.getItem(environment.accessTokenKey);
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+    return this.http.get<Announcement>(`${environment.apiUrl}/announcements/${id}`, {headers});
+  }
+
   create(announcement: Partial<Announcement>): Observable<Announcement> {
     const token = localStorage.getItem(environment.accessTokenKey);
     const headers = new HttpHeaders({
@@ -25,7 +33,7 @@ export class AnnouncementService {
     return this.http.post<Announcement>(`${environment.apiUrl}/announcements`, announcement, {headers});
   }
 
-  update(announcement: Announcement): Observable<Announcement> {
+  update(announcement: Partial<Announcement>): Observable<Announcement> {
     const token = localStorage.getItem(environment.accessTokenKey);
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`,

@@ -13,3 +13,8 @@ export const selectAnnouncementsLoading = createSelector(
   selectAnnouncementsState,
   state => state.loading
 );
+
+export const selectSelectedAnnouncement = createSelector(
+  selectAnnouncementsState,
+  (state: AnnouncementsState) => state.selectedAnnouncement
+);

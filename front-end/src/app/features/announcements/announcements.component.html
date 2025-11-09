@@ -1,7 +1,7 @@
 <div class="announcements-container">
   <h2 class="page-title">Company Announcements</h2>
 
-  <div *ngIf="isAdmin" class="add-announcement-wrapper">
+  <div *ngIf="isAdmin()" class="add-announcement-wrapper">
     <button class="btn add-btn" (click)="addAnnouncement()">
       <i class="fas fa-plus"></i> Add Announcement
     </button>
@@ -15,10 +15,7 @@
       <p class="message">{{ ann.message }}</p>
 
       <div class="card-buttons">
-        <button class="btn read-more">Read more</button>
-        <button *ngIf="isAdmin()" class="btn edit-btn" (click)="editAnnouncement(ann)">
-          <i class="fas fa-edit"></i> Edit
-        </button>
+        <button class="btn read-more" (click)="showAnnouncement(ann)">Read more</button>
         <button *ngIf="isAdmin()" class="btn delete-btn" (click)="deleteAnnouncement(ann)">
           <i class="fas fa-trash"></i> Delete
         </button>
