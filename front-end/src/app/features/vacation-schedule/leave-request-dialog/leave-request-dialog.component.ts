@@ -11,23 +11,27 @@ import { LeaveType } from '../../../core/models/lookups.model';
   imports: [CommonModule, FormsModule],
 })
 export class LeaveRequestDialogComponent {
-  @Output() confirmSelection = new EventEmitter<{ leaveTypeId: number; note?: string }>();
+  @Output() confirmSelection = new EventEmitter<{
+    leaveTypeId: number;
+    note?: string;
+  }>();
   @Output() cancelSelection = new EventEmitter<void>();
 
   selectedLeaveTypeId: number | null = null;
   note: string = '';
 
-  leaveTypes: LeaveType[] = [ //mozemo da ih ucitamo iz lookupservice-a
+  leaveTypes: LeaveType[] = [
+    //mozemo da ih ucitamo iz lookupservice-a
     { leaveTypeId: 1, leaveTypeName: 'Vacation' },
     { leaveTypeId: 2, leaveTypeName: 'Sick' },
-    { leaveTypeId: 3, leaveTypeName: 'Remote' }
+    { leaveTypeId: 3, leaveTypeName: 'Remote' },
   ];
 
   confirm() {
     if (this.selectedLeaveTypeId != null) {
       this.confirmSelection.emit({
         leaveTypeId: this.selectedLeaveTypeId,
-        note: this.note ? this.note : undefined
+        note: this.note ? this.note : undefined,
       });
     }
   }

@@ -5,7 +5,10 @@ import { startOfWeek, addDays, format } from 'date-fns';
 import * as WorkLogsActions from '../../store/workLogs/workLogs.actions';
 import * as LeaveRequestActions from '../../store/leave-requests/leave-requests.actions';
 import { WorkLog } from '../../core/models/workLog.model';
-import { selectAllWorkLogs, selectCurrentWorkLog } from '../../store/workLogs/workLogs.selectors';
+import {
+  selectAllWorkLogs,
+  selectCurrentWorkLog,
+} from '../../store/workLogs/workLogs.selectors';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { selectCurrentUser } from '../../store/users/users.selectors';
@@ -34,11 +37,11 @@ export class AttendanceComponent implements OnInit {
   breakInterval: any = null;
 
   weeklyLogs = computed(() => {
-  const today = new Date();
-  const weekStart = startOfWeek(today, { weekStartsOn: 1 });
-  const leaves = this.approvedLeaves();
+    const today = new Date();
+    const weekStart = startOfWeek(today, { weekStartsOn: 1 });
+    const leaves = this.approvedLeaves();
 
-  const logs: Array<{
+    const logs: Array<{
       log: WorkLog | null;
       day: Date;
       isWeekend: boolean;
@@ -51,18 +54,20 @@ export class AttendanceComponent implements OnInit {
       const day = addDays(weekStart, i);
       day.setHours(0, 0, 0, 0);
 
-      const existingLog = this.allLogs().find(log => {
+      const existingLog = this.allLogs().find((log) => {
         const logDate = new Date(log.workDate);
         logDate.setHours(0, 0, 0, 0);
         return logDate.getTime() === day.getTime();
       });
 
-      const leave = leaves.find(l => {
+      const leave = leaves.find((l) => {
         const start = new Date(l.startDate);
         start.setHours(0, 0, 0, 0);
         const end = new Date(l.endDate);
         end.setHours(0, 0, 0, 0);
-        return day.getTime() >= start.getTime() && day.getTime() <= end.getTime();
+        return (
+          day.getTime() >= start.getTime() && day.getTime() <= end.getTime()
+        );
       });
 
       logs.push({
@@ -79,33 +84,48 @@ export class AttendanceComponent implements OnInit {
   });
 
   ngOnInit() {
-    this.store.select(selectCurrentUser).subscribe(user => {
+    this.store.select(selectCurrentUser).subscribe((user) => {
       if (user) {
         this.currentUserId.set(user.userId);
-        this.store.dispatch(WorkLogsActions.loadCurrentWeekLogs({ userId: user.userId! }));
-        this.store.dispatch(WorkLogsActions.loadWorkLogForDate({ userId: user.userId!, date: format(new Date(), 'yyyy-MM-dd') }));
-        const weekStart = format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd');
-        const weekEnd = format(addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), 6), 'yyyy-MM-dd');
+        this.store.dispatch(
+          WorkLogsActions.loadCurrentWeekLogs({ userId: user.userId! })
+        );
+        this.store.dispatch(
+          WorkLogsActions.loadWorkLogForDate({
+            userId: user.userId!,
+            date: format(new Date(), 'yyyy-MM-dd'),
+          })
+        );
+        const weekStart = format(
+          startOfWeek(new Date(), { weekStartsOn: 1 }),
+          'yyyy-MM-dd'
+        );
+        const weekEnd = format(
+          addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), 6),
+          'yyyy-MM-dd'
+        );
 
-        this.store.dispatch(LeaveRequestActions.loadApprovedLeavesForWeek({
-          userId: user.userId!,
-          start: weekStart,
-          end: weekEnd
-        }));
+        this.store.dispatch(
+          LeaveRequestActions.loadApprovedLeavesForWeek({
+            userId: user.userId!,
+            start: weekStart,
+            end: weekEnd,
+          })
+        );
       }
     });
 
-    this.store.select(selectAllWorkLogs).subscribe(logs => {
+    this.store.select(selectAllWorkLogs).subscribe((logs) => {
       this.allLogs.set(logs);
     });
-    this.store.select(selectCurrentWorkLog).subscribe(log => {
+    this.store.select(selectCurrentWorkLog).subscribe((log) => {
       if (log) {
         this.isOnBreak.set(!!log.startBreakTime && !log.breakMinutes);
       } else {
         this.isOnBreak.set(false);
       }
     });
-    this.store.select(selectWeeklyApprovedLeavesForUser).subscribe(leaves => {
+    this.store.select(selectWeeklyApprovedLeavesForUser).subscribe((leaves) => {
       this.approvedLeaves.set(leaves || []);
     });
   }
@@ -116,16 +136,16 @@ export class AttendanceComponent implements OnInit {
 
   clockIn(day: Date) {
     if (this.isWeekend(day)) return;
-      const userId = this.getUserId();
+    const userId = this.getUserId();
     if (!userId) return;
-      this.store.dispatch(WorkLogsActions.clockIn({ userId }));
+    this.store.dispatch(WorkLogsActions.clockIn({ userId }));
   }
 
   clockOut(day: Date) {
     if (this.isWeekend(day)) return;
-      const userId = this.getUserId();
+    const userId = this.getUserId();
     if (!userId) return;
-      this.store.dispatch(WorkLogsActions.clockOut({ userId }));
+    this.store.dispatch(WorkLogsActions.clockOut({ userId }));
   }
 
   takeBreak(day: Date) {
@@ -151,9 +171,11 @@ export class AttendanceComponent implements OnInit {
 
   isToday(day: Date) {
     const today = new Date();
-    return day.getFullYear() === today.getFullYear() &&
-          day.getMonth() === today.getMonth() &&
-          day.getDate() === today.getDate();
+    return (
+      day.getFullYear() === today.getFullYear() &&
+      day.getMonth() === today.getMonth() &&
+      day.getDate() === today.getDate()
+    );
   }
 
   convertTotalHoursToHHMMSS(totalHours: number | null | undefined): string {
@@ -172,7 +194,6 @@ export class AttendanceComponent implements OnInit {
     return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
   }
 
-
   openWorkTypeDialog(day: Date) {
     this.selectedDay = day;
     this.showWorkTypeDialog = true;
@@ -184,7 +205,9 @@ export class AttendanceComponent implements OnInit {
     const userId = this.getUserId();
     if (!userId || !this.selectedDay) return;
 
-    this.store.dispatch(WorkLogsActions.clockIn({ userId, workTypeId: workTypeId }));
+    this.store.dispatch(
+      WorkLogsActions.clockIn({ userId, workTypeId: workTypeId })
+    );
     this.selectedDay = null;
   }
 

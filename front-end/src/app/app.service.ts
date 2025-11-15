@@ -5,13 +5,13 @@ import { UserService } from './core/services/user/user.service';
 
 @Injectable({ providedIn: 'root' })
 export class AppInitService {
-    private store: Store = inject(Store);
-    private userService: UserService = inject(UserService);
+  private store: Store = inject(Store);
+  private userService: UserService = inject(UserService);
 
-    initCurrentUser() {
-        const userId = this.userService.getUserId();
-        if (userId) {
-            this.store.dispatch(UsersActions.setCurrentUser({ userId }));
-        }
+  initCurrentUser() {
+    const userId = this.userService.getUserId();
+    if (userId) {
+      this.store.dispatch(UsersActions.setCurrentUser({ userId }));
     }
+  }
 }

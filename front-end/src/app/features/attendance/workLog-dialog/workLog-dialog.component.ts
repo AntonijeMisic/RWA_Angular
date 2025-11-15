@@ -16,9 +16,10 @@ export class WorkLogDialogComponent {
 
   selectedWorkTypeId: number | null = null;
 
-  workTypes: WorkType[] = [ //mozemo da ih ucitamo iz lookupservice-a
+  workTypes: WorkType[] = [
+    //mozemo da ih ucitamo iz lookupservice-a
     { workTypeId: 1, workTypeName: 'Office' },
-    { workTypeId: 2, workTypeName: 'Remote' }
+    { workTypeId: 2, workTypeName: 'Remote' },
   ];
 
   confirm() {

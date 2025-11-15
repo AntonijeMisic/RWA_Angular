@@ -5,36 +5,53 @@ import { WorkLog } from '../../models/workLog.model';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class WorkLogService {
   private http = inject(HttpClient);
 
   clockIn(userId: number, workTypeId?: number): Observable<WorkLog> {
-    return this.http.post<WorkLog>(`${environment.apiUrl}/worklog/clock-in`, { userId, workTypeId });
+    return this.http.post<WorkLog>(`${environment.apiUrl}/worklog/clock-in`, {
+      userId,
+      workTypeId,
+    });
   }
 
   takeBreak(userId: number): Observable<WorkLog> {
-    return this.http.post<WorkLog>(`${environment.apiUrl}/worklog/start-break`, { userId });
+    return this.http.post<WorkLog>(
+      `${environment.apiUrl}/worklog/start-break`,
+      { userId }
+    );
   }
 
   resumeWork(userId: number): Observable<WorkLog> {
-    return this.http.post<WorkLog>(`${environment.apiUrl}/worklog/resume-work`, { userId });
+    return this.http.post<WorkLog>(
+      `${environment.apiUrl}/worklog/resume-work`,
+      { userId }
+    );
   }
 
   clockOut(userId: number): Observable<WorkLog> {
-    return this.http.post<WorkLog>(`${environment.apiUrl}/worklog/clock-out`, { userId });
+    return this.http.post<WorkLog>(`${environment.apiUrl}/worklog/clock-out`, {
+      userId,
+    });
   }
 
   getWorkLogsForUser(userId: number): Observable<WorkLog[]> {
-    return this.http.get<WorkLog[]>(`${environment.apiUrl}/worklog/my-logs?userId=${userId}`);
+    return this.http.get<WorkLog[]>(
+      `${environment.apiUrl}/worklog/my-logs?userId=${userId}`
+    );
   }
 
   getCurrentWeekLogs(userId: number): Observable<WorkLog[]> {
-    return this.http.get<WorkLog[]>(`${environment.apiUrl}/workLog/current-week?userId=${userId}`);
+    return this.http.get<WorkLog[]>(
+      `${environment.apiUrl}/workLog/current-week?userId=${userId}`
+    );
   }
 
   getCurrentLog(userId: number, date: string): Observable<WorkLog> {
-    return this.http.get<WorkLog>( `${environment.apiUrl}/workLog/user/${userId}/date/${date}`);
+    return this.http.get<WorkLog>(
+      `${environment.apiUrl}/workLog/user/${userId}/date/${date}`
+    );
   }
 }

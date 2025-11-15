@@ -1,8 +1,14 @@
 import { createAction, props } from '@ngrx/store';
-import { LeaveRequest, CreateLeaveRequest, UpdateStatusDto } from '../../core/models/leaveRequest.model';
+import {
+  LeaveRequest,
+  CreateLeaveRequest,
+  UpdateStatusDto,
+} from '../../core/models/leaveRequest.model';
 import { LeaveType } from '../../core/models/lookups.model';
 
-export const loadLeaveRequests= createAction('[LeaveRequest] Load Leave Requests');
+export const loadLeaveRequests = createAction(
+  '[LeaveRequest] Load Leave Requests'
+);
 
 export const loadLeaveRequestsSuccess = createAction(
   '[LeaveRequest] Load Leave Requests Success',
@@ -32,7 +38,7 @@ export const loadUserLeaveRequestsFailure = createAction(
 
 export const loadApprovedLeavesForWeek = createAction(
   '[Leave Requests] Load Approved Leaves For Week',
-  props<{ userId: number, start: string, end: string }>()
+  props<{ userId: number; start: string; end: string }>()
 );
 
 export const loadApprovedLeavesForWeekSuccess = createAction(

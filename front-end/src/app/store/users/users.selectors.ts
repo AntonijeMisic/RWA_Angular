@@ -3,8 +3,14 @@ import { UsersState } from './users.reducer';
 
 export const selectUsersState = createFeatureSelector<UsersState>('users');
 
-export const selectAllUsers = createSelector(selectUsersState, (state) => state.users);
-export const selectUsersLoading = createSelector(selectUsersState, (state) => state.loading);
+export const selectAllUsers = createSelector(
+  selectUsersState,
+  (state) => state.users
+);
+export const selectUsersLoading = createSelector(
+  selectUsersState,
+  (state) => state.loading
+);
 export const selectCurrentUser = createSelector(
   selectUsersState,
   (state) => state.currentUser
@@ -14,4 +20,4 @@ export const selectSelectedUser = createSelector(
   (state) => state.selectedUser
 );
 export const selectUserById = (id: number | null) =>
-  createSelector(selectAllUsers, users => users.find(u => u.userId === id));
+  createSelector(selectAllUsers, (users) => users.find((u) => u.userId === id));

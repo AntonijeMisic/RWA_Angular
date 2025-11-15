@@ -4,10 +4,8 @@ import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard.component',
-  imports: [SidebarComponent, RouterModule ],
+  imports: [SidebarComponent, RouterModule],
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.css'
+  styleUrl: './dashboard.component.css',
 })
-export class DashboardComponent {
-
-}
+export class DashboardComponent {}

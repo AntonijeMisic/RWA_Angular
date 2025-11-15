@@ -6,12 +6,12 @@ export const selectAnnouncementsState =
 
 export const selectAllAnnouncements = createSelector(
   selectAnnouncementsState,
-  state => state.announcements
+  (state) => state.announcements
 );
 
 export const selectAnnouncementsLoading = createSelector(
   selectAnnouncementsState,
-  state => state.loading
+  (state) => state.loading
 );
 
 export const selectSelectedAnnouncement = createSelector(

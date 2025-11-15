@@ -1,4 +1,4 @@
-import { WorkType } from "./lookups.model";
+import { WorkType } from './lookups.model';
 
 export interface WorkLog {
   worklogId: number;

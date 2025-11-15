@@ -5,15 +5,16 @@ import { firstValueFrom, Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LookupsService {
-
   http: HttpClient = inject(HttpClient);
   private lookups!: LookupEntities;
 
   getAllLookups(): Observable<LookupEntities> {
-    return this.http.get<LookupEntities>(`${environment.apiUrl}/lookups/lookups`);
+    return this.http.get<LookupEntities>(
+      `${environment.apiUrl}/lookups/lookups`
+    );
   }
 
   setLookups(lookups: LookupEntities): void {

@@ -16,20 +16,21 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
   templateUrl: './announcements.component.html',
   styleUrls: ['./announcements.component.css'],
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
-  standalone: true
+  standalone: true,
 })
 export class AnnouncementsComponent implements OnInit {
-
   private store = inject(Store<AppState>);
   private router = inject(Router);
 
-  announcements$: Observable<Announcement[]> = this.store.select(selectAllAnnouncements);
+  announcements$: Observable<Announcement[]> = this.store.select(
+    selectAllAnnouncements
+  );
   isAdmin = signal(false);
 
   ngOnInit(): void {
     this.store.dispatch(AnnouncementsActions.loadAnnouncements());
 
-    this.store.select(selectCurrentUser).subscribe(user => {
+    this.store.select(selectCurrentUser).subscribe((user) => {
       this.isAdmin.set(!!user && user.userRole?.roleName === 'Admin');
     });
   }
@@ -43,6 +44,8 @@ export class AnnouncementsComponent implements OnInit {
   }
 
   deleteAnnouncement(ann: Announcement) {
-    this.store.dispatch(AnnouncementsActions.deleteAnnouncement({ id: ann.announcementId }));
+    this.store.dispatch(
+      AnnouncementsActions.deleteAnnouncement({ id: ann.announcementId })
+    );
   }
 }

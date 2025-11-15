@@ -6,8 +6,15 @@ import { map } from 'rxjs/operators';
 import { AppState } from '../../store/app.state';
 import { LeaveRequest } from '../../core/models/leaveRequest.model';
 import { LeaveType, RequestStatus } from '../../core/models/lookups.model';
-import { loadUserLeaveRequests, loadLeaveTypes, createLeaveRequest } from '../../store/leave-requests/leave-requests.actions';
-import { selectAllLeaveRequestsByUser, selectLeaveTypes } from '../../store/leave-requests/leave-requests.selectors';
+import {
+  loadUserLeaveRequests,
+  loadLeaveTypes,
+  createLeaveRequest,
+} from '../../store/leave-requests/leave-requests.actions';
+import {
+  selectAllLeaveRequestsByUser,
+  selectLeaveTypes,
+} from '../../store/leave-requests/leave-requests.selectors';
 import { selectCurrentUser } from '../../store/users/users.selectors';
 import { LeaveRequestDialogComponent } from './leave-request-dialog/leave-request-dialog.component';
 
@@ -34,7 +41,7 @@ interface Month {
   standalone: true,
   imports: [CommonModule, LeaveRequestDialogComponent],
   templateUrl: './vacation-schedule.component.html',
-  styleUrls: ['./vacation-schedule.component.css']
+  styleUrls: ['./vacation-schedule.component.css'],
 })
 export class VacationScheduleComponent implements OnInit {
   currentYear = new Date().getFullYear();
@@ -49,79 +56,85 @@ export class VacationScheduleComponent implements OnInit {
   leaveRequests$: Observable<LeaveRequest[]> = this.store.select(
     selectAllLeaveRequestsByUser
   );
-  leaveTypes$: Observable<LeaveType[]> = this.store.select(
-    selectLeaveTypes
-  );
+  leaveTypes$: Observable<LeaveType[]> = this.store.select(selectLeaveTypes);
 
   private firstSelectedDay: Day | null = null;
-
 
   ngOnInit() {
     this.generateMonths();
 
     // učitaj leaveRequests i leaveTypes iz store-a
-    combineLatest([
-      this.store.select(selectCurrentUser)
-    ]).pipe(
-      map(([user]) => user)
-    ).subscribe(user => {
-      if (user) {
-         this.currentUserId.set(user.userId);
-        this.store.dispatch(loadUserLeaveRequests({ userId: user.userId! }));
-        this.store.dispatch(loadLeaveTypes());
-      }
-    });
+    combineLatest([this.store.select(selectCurrentUser)])
+      .pipe(map(([user]) => user))
+      .subscribe((user) => {
+        if (user) {
+          this.currentUserId.set(user.userId);
+          this.store.dispatch(loadUserLeaveRequests({ userId: user.userId! }));
+          this.store.dispatch(loadLeaveTypes());
+        }
+      });
 
     // mapiranje leaveRequests na dane u kalendaru
-    this.leaveRequests$.subscribe(requests => {
+    this.leaveRequests$.subscribe((requests) => {
       this.clearAllSelections(false); // ne brisemo lokalnu selekciju, samo status
       this.applyRequestsToCalendar(requests);
     });
   }
 
-  private getUserId(): number | null { return this.currentUserId(); }
+  private getUserId(): number | null {
+    return this.currentUserId();
+  }
 
   private generateMonths() {
-  const monthNames = [
-    'January','February','March','April','May','June',
-    'July','August','September','October','November','December'
-  ];
+    const monthNames = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
 
-  const today = new Date();
+    const today = new Date();
 
-  for (let i = 0; i < 12; i++) {
-    const daysInMonth = new Date(this.currentYear, i + 1, 0).getDate();
-    const month: Month = { name: monthNames[i], days: [] };
+    for (let i = 0; i < 12; i++) {
+      const daysInMonth = new Date(this.currentYear, i + 1, 0).getDate();
+      const month: Month = { name: monthNames[i], days: [] };
 
-    // prvi dan u mesecu
-    const firstDayOfMonth = new Date(this.currentYear, i, 1);
-    const startWeekDay = firstDayOfMonth.getDay(); // 0 = Sunday, 1 = Monday ...
+      // prvi dan u mesecu
+      const firstDayOfMonth = new Date(this.currentYear, i, 1);
+      const startWeekDay = firstDayOfMonth.getDay(); // 0 = Sunday, 1 = Monday ...
 
-    // dodajemo prazne dane pre prvog dana u mesecu
-    for (let j = 0; j < startWeekDay; j++) {
-      month.days.push({
-        date: 0,       // prazna ćelija
-        isPast: false,
-        selected: false,
-        monthIndex: i
-      });
+      // dodajemo prazne dane pre prvog dana u mesecu
+      for (let j = 0; j < startWeekDay; j++) {
+        month.days.push({
+          date: 0, // prazna ćelija
+          isPast: false,
+          selected: false,
+          monthIndex: i,
+        });
+      }
+
+      // dodajemo stvarne dane
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateObj = new Date(this.currentYear, i, d);
+        month.days.push({
+          date: d,
+          isPast: dateObj < today,
+          selected: false,
+          monthIndex: i,
+        });
+      }
+
+      this.months.push(month);
     }
-
-    // dodajemo stvarne dane
-    for (let d = 1; d <= daysInMonth; d++) {
-      const dateObj = new Date(this.currentYear, i, d);
-      month.days.push({
-        date: d,
-        isPast: dateObj < today,
-        selected: false,
-        monthIndex: i
-      });
-    }
-
-    this.months.push(month);
   }
-}
-
 
   selectDay(day: Day) {
     if (day.isPast || day.requestStatus) return;
@@ -139,7 +152,7 @@ export class VacationScheduleComponent implements OnInit {
       this.clearAllSelections(true);
 
       for (let m = startMonth; m <= endMonth; m++) {
-        this.months[m].days.forEach(d => {
+        this.months[m].days.forEach((d) => {
           if (startMonth === endMonth) {
             if (d.date >= startDate && d.date <= endDate) d.selected = true;
           } else {
@@ -149,8 +162,8 @@ export class VacationScheduleComponent implements OnInit {
           }
 
           if (d.selected) {
-            d.isRangeStart = (m === startMonth && d.date === startDate);
-            d.isRangeEnd = (m === endMonth && d.date === endDate);
+            d.isRangeStart = m === startMonth && d.date === startDate;
+            d.isRangeEnd = m === endMonth && d.date === endDate;
             d.isRangeMiddle = !d.isRangeStart && !d.isRangeEnd;
           }
         });
@@ -162,7 +175,6 @@ export class VacationScheduleComponent implements OnInit {
   }
 
   onLeaveDialogConfirm(data: { leaveTypeId: number; note?: string }) {
-
     const startDay = this.getFirstSelectedDay();
     const endDay = this.getLastSelectedDay();
 
@@ -181,10 +193,14 @@ export class VacationScheduleComponent implements OnInit {
         dto: {
           userId: this.getUserId()!,
           leaveTypeId: data.leaveTypeId,
-          startDate: new Date(this.currentYear, startDay.monthIndex, startDay.date),
+          startDate: new Date(
+            this.currentYear,
+            startDay.monthIndex,
+            startDay.date
+          ),
           endDate: new Date(this.currentYear, endDay.monthIndex, endDay.date),
-          note: data.note
-        }
+          note: data.note,
+        },
       })
     );
 
@@ -213,8 +229,8 @@ export class VacationScheduleComponent implements OnInit {
   }
 
   private clearAllSelections(clearVisual: boolean = true) {
-    this.months.forEach(m =>
-      m.days.forEach(d => {
+    this.months.forEach((m) =>
+      m.days.forEach((d) => {
         if (clearVisual) {
           d.selected = false;
           d.isRangeStart = false;
@@ -226,8 +242,8 @@ export class VacationScheduleComponent implements OnInit {
   }
 
   private cancelSelection() {
-    this.months.forEach(m =>
-      m.days.forEach(d => {
+    this.months.forEach((m) =>
+      m.days.forEach((d) => {
         if (d.selected && !d.requestStatus) {
           d.selected = false;
           d.isRangeStart = false;
@@ -241,15 +257,23 @@ export class VacationScheduleComponent implements OnInit {
   }
 
   private applyRequestsToCalendar(requests: LeaveRequest[]) {
-    requests.forEach(req => {
+    requests.forEach((req) => {
       const start = new Date(req.startDate);
       const end = new Date(req.endDate);
 
       for (let m = start.getMonth(); m <= end.getMonth(); m++) {
-        const startDateOnly = new Date(start.getFullYear(), start.getMonth(), start.getDate());
-        const endDateOnly = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+        const startDateOnly = new Date(
+          start.getFullYear(),
+          start.getMonth(),
+          start.getDate()
+        );
+        const endDateOnly = new Date(
+          end.getFullYear(),
+          end.getMonth(),
+          end.getDate()
+        );
 
-        this.months[m].days.forEach(d => {
+        this.months[m].days.forEach((d) => {
           if (d.date === 0) return; // preskoči prazne ćelije
 
           const dayDate = new Date(this.currentYear, m, d.date);
@@ -265,7 +289,11 @@ export class VacationScheduleComponent implements OnInit {
   }
 
   private hasOverlapWithExistingRequests(startDay: Day, endDay: Day): boolean {
-    const startDate = new Date(this.currentYear, startDay.monthIndex, startDay.date);
+    const startDate = new Date(
+      this.currentYear,
+      startDay.monthIndex,
+      startDay.date
+    );
     const endDate = new Date(this.currentYear, endDay.monthIndex, endDay.date);
 
     for (const month of this.months) {
@@ -285,10 +313,14 @@ export class VacationScheduleComponent implements OnInit {
   getDayColor(day: Day) {
     if (!day.requestStatus) return '';
     switch (day.requestStatus.requestStatusName) {
-      case 'Pending': return 'orange';
-      case 'Approved': return 'green';
-      case 'Rejected': return 'red';
-      default: return '';
+      case 'Pending':
+        return 'orange';
+      case 'Approved':
+        return 'green';
+      case 'Rejected':
+        return 'red';
+      default:
+        return '';
     }
   }
 }

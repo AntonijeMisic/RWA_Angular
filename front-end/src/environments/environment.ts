@@ -3,5 +3,5 @@ export const environment = {
   apiUrl: 'http://localhost:3000',
   accessTokenKey: 'access_token',
   refreshTokenKey: 'refresh_token',
-  userKey: 'userId'
+  userKey: 'userId',
 };

@@ -1,4 +1,10 @@
-import { provideAppInitializer, inject, ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import {
+  provideAppInitializer,
+  inject,
+  ApplicationConfig,
+  provideBrowserGlobalErrorListeners,
+  provideZoneChangeDetection,
+} from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { LookupsService } from './core/services/lookups/lookups.service';
 import { provideHttpClient, withFetch } from '@angular/common/http';
@@ -34,9 +40,14 @@ export const appConfig: ApplicationConfig = {
       users: usersReducer,
       announcements: announcementsReducer,
       workLogs: workLogsReducer,
-      leaveRequests: leaveRequestReducer
+      leaveRequests: leaveRequestReducer,
     }),
     provideStoreDevtools({ maxAge: 25 }),
-    provideEffects([UsersEffects, AnnouncementsEffects, WorkLogsEffects, LeaveRequestEffects]),
-  ]
+    provideEffects([
+      UsersEffects,
+      AnnouncementsEffects,
+      WorkLogsEffects,
+      LeaveRequestEffects,
+    ]),
+  ],
 };

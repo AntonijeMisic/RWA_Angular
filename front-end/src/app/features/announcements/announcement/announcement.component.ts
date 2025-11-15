@@ -1,5 +1,11 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { User } from '../../../core/models/user.model';
@@ -16,7 +22,7 @@ import { Router } from '@angular/router';
   templateUrl: './announcement.component.html',
   styleUrls: ['./announcement.component.css'],
   imports: [ReactiveFormsModule, CommonModule, FormsModule],
-  standalone: true
+  standalone: true,
 })
 export class AnnouncementComponent implements OnInit {
   announcementForm!: FormGroup;
@@ -32,13 +38,12 @@ export class AnnouncementComponent implements OnInit {
   isAdmin = signal(false);
 
   ngOnInit(): void {
-
     this.announcementForm = this.fb.group({
       title: ['', [Validators.required, Validators.maxLength(200)]],
-      message: ['', Validators.required]
+      message: ['', Validators.required],
     });
 
-    this.store.select(selectCurrentUser).subscribe(user => {
+    this.store.select(selectCurrentUser).subscribe((user) => {
       this.isAdmin.set(!!user && user.userRole?.roleName === 'Admin');
 
       if (!!user && user.userRole?.roleName !== 'Admin') {
@@ -51,22 +56,28 @@ export class AnnouncementComponent implements OnInit {
     const id = Number(this.route.snapshot.paramMap.get('id'));
 
     if (id) {
-      this.store.select(state => state.announcements.selectedAnnouncement).subscribe(selected => {
-        if (selected && selected.announcementId === id) {
-          this.announcementForm.patchValue(selected);
-          this.isLoading.set(false);
-          this.announcementNotFound.set(false);
-        } else if (!selected || selected.announcementId !== id) {
-          this.store.dispatch(AnnouncementsActions.loadAnnouncementById({ id }));
-        }
-      });
+      this.store
+        .select((state) => state.announcements.selectedAnnouncement)
+        .subscribe((selected) => {
+          if (selected && selected.announcementId === id) {
+            this.announcementForm.patchValue(selected);
+            this.isLoading.set(false);
+            this.announcementNotFound.set(false);
+          } else if (!selected || selected.announcementId !== id) {
+            this.store.dispatch(
+              AnnouncementsActions.loadAnnouncementById({ id })
+            );
+          }
+        });
 
-      this.store.select(state => state.announcements.error).subscribe(failed => {
-        if (failed) {
-          this.isLoading.set(false);
-          this.announcementNotFound.set(true);
-        }
-      });
+      this.store
+        .select((state) => state.announcements.error)
+        .subscribe((failed) => {
+          if (failed) {
+            this.isLoading.set(false);
+            this.announcementNotFound.set(true);
+          }
+        });
     } else {
       this.isLoading.set(false);
     }
@@ -80,26 +91,33 @@ export class AnnouncementComponent implements OnInit {
 
     const id = Number(this.route.snapshot.paramMap.get('id'));
 
-    this.store.select(selectCurrentUser).pipe(take(1)).subscribe(currentUser => {
-      if (!currentUser) {
-        return;
-      }
+    this.store
+      .select(selectCurrentUser)
+      .pipe(take(1))
+      .subscribe((currentUser) => {
+        if (!currentUser) {
+          return;
+        }
 
-      const formData = this.announcementForm.getRawValue();
+        const formData = this.announcementForm.getRawValue();
 
-      const announcement: Partial<Announcement> = {
-        ...formData,
-        createdBy: currentUser,
-        ...(id ? { announcementId: id } : {})
-      };
+        const announcement: Partial<Announcement> = {
+          ...formData,
+          createdBy: currentUser,
+          ...(id ? { announcementId: id } : {}),
+        };
 
-      if (id) {
-        this.store.dispatch(AnnouncementsActions.updateAnnouncement({ announcement }));
-      } else {
-        this.store.dispatch(AnnouncementsActions.createAnnouncement({ announcement }));
-      }
+        if (id) {
+          this.store.dispatch(
+            AnnouncementsActions.updateAnnouncement({ announcement })
+          );
+        } else {
+          this.store.dispatch(
+            AnnouncementsActions.createAnnouncement({ announcement })
+          );
+        }
 
-      this.router.navigate(['/home/announcements']);
-    });
+        this.router.navigate(['/home/announcements']);
+      });
   }
 }

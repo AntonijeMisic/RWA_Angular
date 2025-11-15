@@ -6,7 +6,11 @@ import { LookupsService } from '../../core/services/lookups/lookups.service';
 import { UserPosition, UserRole } from '../../core/models/lookups.model';
 import { Store, StoreModule } from '@ngrx/store';
 import * as UsersActions from '../../store/users/users.actions';
-import { selectAllUsers, selectUserById, selectUsersLoading } from '../../store/users/users.selectors';
+import {
+  selectAllUsers,
+  selectUserById,
+  selectUsersLoading,
+} from '../../store/users/users.selectors';
 import { Observable } from 'rxjs';
 import { AppState } from '../../store/app.state';
 import { UserService } from '../../core/services/user/user.service';
@@ -24,10 +28,9 @@ type UserFilterForm = {
   selector: 'app-users-list.component',
   imports: [CommonModule, RouterModule, StoreModule, ReactiveFormsModule],
   templateUrl: './users-list.component.html',
-  styleUrl: './users-list.component.css'
+  styleUrl: './users-list.component.css',
 })
 export class UsersListComponent implements OnInit {
-
   lookupService = inject(LookupsService);
   userService = inject(UserService);
   store = inject(Store<AppState>);
@@ -45,7 +48,7 @@ export class UsersListComponent implements OnInit {
     const userId = this.userService.getUserId();
     if (!userId) return;
 
-    this.userService.getUserById(userId).subscribe(user => {
+    this.userService.getUserById(userId).subscribe((user) => {
       this.isAdmin.set(user.userRole?.roleName === 'Admin');
     });
 
@@ -78,7 +81,7 @@ export class UsersListComponent implements OnInit {
       lastName: filterValues.lastName || undefined,
       email: filterValues.email || undefined,
       userRoleId: filterValues.userRoleId || undefined,
-      userPositionId: filterValues.userPositionId || undefined
+      userPositionId: filterValues.userPositionId || undefined,
     };
 
     this.store.dispatch(UsersActions.loadUsers({ filter: filterDto }));
@@ -86,6 +89,6 @@ export class UsersListComponent implements OnInit {
   }
 
   onDelete(userId: number) {
-      this.store.dispatch(UsersActions.deleteUser({ userId }));
+    this.store.dispatch(UsersActions.deleteUser({ userId }));
   }
 }

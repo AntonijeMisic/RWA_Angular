@@ -6,7 +6,7 @@ import { AppState } from '../../../store/app.state';
 import { selectCurrentUser } from '../../../store/users/users.selectors';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AdminGuard implements CanActivate {
   private store = inject(Store<AppState>);
@@ -15,7 +15,7 @@ export class AdminGuard implements CanActivate {
   canActivate() {
     return this.store.select(selectCurrentUser).pipe(
       take(1),
-      map(user => {
+      map((user) => {
         if (user && user.userRole.roleName?.toLowerCase() === 'admin') {
           return true;
         } else {

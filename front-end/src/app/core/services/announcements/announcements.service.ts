@@ -6,7 +6,6 @@ import { environment } from '../../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AnnouncementService {
-
   constructor(private http: HttpClient) {}
 
   getAllAnnouncements(): Observable<Announcement[]> {
@@ -14,7 +13,10 @@ export class AnnouncementService {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`,
     });
-    return this.http.get<Announcement[]>(`${environment.apiUrl}/announcements`, {headers});
+    return this.http.get<Announcement[]>(
+      `${environment.apiUrl}/announcements`,
+      { headers }
+    );
   }
 
   getAnnouncementById(id: number): Observable<Announcement> {
@@ -22,7 +24,10 @@ export class AnnouncementService {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`,
     });
-    return this.http.get<Announcement>(`${environment.apiUrl}/announcements/${id}`, {headers});
+    return this.http.get<Announcement>(
+      `${environment.apiUrl}/announcements/${id}`,
+      { headers }
+    );
   }
 
   create(announcement: Partial<Announcement>): Observable<Announcement> {
@@ -30,7 +35,11 @@ export class AnnouncementService {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`,
     });
-    return this.http.post<Announcement>(`${environment.apiUrl}/announcements`, announcement, {headers});
+    return this.http.post<Announcement>(
+      `${environment.apiUrl}/announcements`,
+      announcement,
+      { headers }
+    );
   }
 
   update(announcement: Partial<Announcement>): Observable<Announcement> {
@@ -40,7 +49,8 @@ export class AnnouncementService {
     });
     return this.http.put<Announcement>(
       `${environment.apiUrl}/announcements/${announcement.announcementId}`,
-      announcement, { headers }
+      announcement,
+      { headers }
     );
   }
 
@@ -49,6 +59,8 @@ export class AnnouncementService {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`,
     });
-    return this.http.delete<void>(`${environment.apiUrl}/announcements/${id}`, { headers });
+    return this.http.delete<void>(`${environment.apiUrl}/announcements/${id}`, {
+      headers,
+    });
   }
 }

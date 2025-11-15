@@ -11,10 +11,9 @@ interface LoginResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-
   private http = inject(HttpClient);
   private router = inject(Router);
 
@@ -47,12 +46,13 @@ export class AuthService {
     const refreshToken = localStorage.getItem('refresh_token');
 
     if (refreshToken) {
-      this.http.post(`${environment.apiUrl}/auth/logout`, { refreshToken }).subscribe({
-        next: () => this.clearAuthData(),
-        error: () => this.clearAuthData(),
-      });
-    }
-    else {
+      this.http
+        .post(`${environment.apiUrl}/auth/logout`, { refreshToken })
+        .subscribe({
+          next: () => this.clearAuthData(),
+          error: () => this.clearAuthData(),
+        });
+    } else {
       this.clearAuthData();
     }
   }

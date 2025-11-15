@@ -38,8 +38,14 @@ export const loadUsers = createAction(
   '[Users] Load Users',
   props<{ filter?: UserFilterDto }>()
 );
-export const loadUsersSuccess = createAction('[Users] Load Users Success', props<{ users: User[] }>());
-export const loadUsersFailure = createAction('[Users] Load Users Failure', props<{ error: any }>()); // ne znam da li ce error biti any ili neki specificniji tip
+export const loadUsersSuccess = createAction(
+  '[Users] Load Users Success',
+  props<{ users: User[] }>()
+);
+export const loadUsersFailure = createAction(
+  '[Users] Load Users Failure',
+  props<{ error: any }>()
+);
 
 export const loadUserById = createAction(
   '[Users] Load User By Id',

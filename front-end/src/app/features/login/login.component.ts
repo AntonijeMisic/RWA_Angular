@@ -1,5 +1,10 @@
 import { Component, inject } from '@angular/core';
-import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormGroup,
+  FormControl,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { CommonModule } from '@angular/common';
@@ -24,20 +29,25 @@ export interface LoginForm {
   imports: [CommonModule, ReactiveFormsModule, HttpClientModule],
   providers: [AuthService],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrl: './login.component.css',
 })
 export class LoginComponent {
-
   loginForm = new FormGroup<LoginForm>({
-    email: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.email] }),
-    password: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    email: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.email],
+    }),
+    password: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
   });
 
   errorMessage: string | null = null;
 
   private store: Store<AppState> = inject(Store<AppState>);
 
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(private authService: AuthService, private router: Router) {}
 
   onSubmit() {
     if (this.loginForm.invalid) {
@@ -52,7 +62,9 @@ export class LoginComponent {
           res.access_token,
           res.refresh_token
         );
-        this.store.dispatch(UsersActions.setCurrentUser({ userId: res.user.userId! }));
+        this.store.dispatch(
+          UsersActions.setCurrentUser({ userId: res.user.userId! })
+        );
         this.router.navigate(['/home']);
       },
       error: (err) => {

@@ -11,10 +11,9 @@ import { UserRole } from '../../models/lookups.model';
 import { UserFilterDto } from '../../dtos/userFilter.dto.';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UserService {
-
   private http = inject(HttpClient);
   private store = inject(Store<AppState>);
 
@@ -25,7 +24,9 @@ export class UserService {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`,
     });
-    return this.http.post<User>(`${environment.apiUrl}/auth/register`, user, { headers });
+    return this.http.post<User>(`${environment.apiUrl}/auth/register`, user, {
+      headers,
+    });
   }
 
   update(user: User): Observable<User> {
@@ -33,7 +34,9 @@ export class UserService {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`,
     });
-    return this.http.post<User>(`${environment.apiUrl}/users/update`, user, { headers });
+    return this.http.post<User>(`${environment.apiUrl}/users/update`, user, {
+      headers,
+    });
   }
 
   getUserId(): number | null {
@@ -43,17 +46,18 @@ export class UserService {
 
   getUserRole(): UserRole | null {
     const userId = this.getUserId();
-    this.store.select(selectUserById(userId))
+    this.store
+      .select(selectUserById(userId))
       .pipe(
         take(1),
-        tap(user => {
+        tap((user) => {
           if (!user) {
             this.store.dispatch(UsersActions.loadUserById({ userId }));
           }
         }),
-        map(user => user?.userRole ?? null)
+        map((user) => user?.userRole ?? null)
       )
-      .subscribe(role => this.currentUserRole.set(role));
+      .subscribe((role) => this.currentUserRole.set(role));
 
     return this.currentUserRole();
   }
@@ -69,11 +73,16 @@ export class UserService {
       if (filter.firstName) params = params.set('firstName', filter.firstName);
       if (filter.lastName) params = params.set('lastName', filter.lastName);
       if (filter.email) params = params.set('email', filter.email);
-      if (filter.userRoleId) params = params.set('userRoleId', filter.userRoleId.toString());
-      if (filter.userPositionId) params = params.set('userPositionId', filter.userPositionId.toString());
+      if (filter.userRoleId)
+        params = params.set('userRoleId', filter.userRoleId.toString());
+      if (filter.userPositionId)
+        params = params.set('userPositionId', filter.userPositionId.toString());
     }
 
-    return this.http.get<User[]>(`${environment.apiUrl}/users`, { headers, params });
+    return this.http.get<User[]>(`${environment.apiUrl}/users`, {
+      headers,
+      params,
+    });
   }
 
   getUserById(id: number): Observable<User> {
@@ -81,7 +90,9 @@ export class UserService {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`,
     });
-    return this.http.get<User>(`${environment.apiUrl}/users/${id}`, { headers });
+    return this.http.get<User>(`${environment.apiUrl}/users/${id}`, {
+      headers,
+    });
   }
 
   deleteUser(userId: number): Observable<void> {
@@ -89,6 +100,8 @@ export class UserService {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`,
     });
-    return this.http.delete<void>(`${environment.apiUrl}/users/${userId}`, {headers});
+    return this.http.delete<void>(`${environment.apiUrl}/users/${userId}`, {
+      headers,
+    });
   }
 }

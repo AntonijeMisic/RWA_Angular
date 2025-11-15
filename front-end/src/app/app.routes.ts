@@ -24,14 +24,21 @@ export const routes: Routes = [
       { path: '', redirectTo: 'attendance', pathMatch: 'full' },
       { path: 'attendance', component: AttendanceComponent },
       { path: 'announcements', component: AnnouncementsComponent },
-      { path: 'announcement', component: AnnouncementComponent, canActivate: [AdminGuard] },
+      {
+        path: 'announcement',
+        component: AnnouncementComponent,
+        canActivate: [AdminGuard],
+      },
       { path: 'announcement/:id', component: AnnouncementComponent },
       { path: 'vacations', component: VacationScheduleComponent },
       { path: 'users', component: UsersListComponent },
       { path: 'profile/:id', component: ProfileComponent },
       { path: 'profile', component: ProfileComponent },
-      { path: 'requests', component: RequestsComponent, canActivate: [AdminGuard]  },
-      // ostali child routovi
+      {
+        path: 'requests',
+        component: RequestsComponent,
+        canActivate: [AdminGuard],
+      },
     ],
   },
   {
@@ -41,7 +48,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: '/home/attendance'
+    redirectTo: '/home/attendance',
   },
 ];
-

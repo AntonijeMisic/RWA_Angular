@@ -1,4 +1,4 @@
-import { UserPosition, UserRole } from "./lookups.model";
+import { UserPosition, UserRole } from './lookups.model';
 
 export interface User {
   userId: number | null;

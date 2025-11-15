@@ -10,7 +10,7 @@ import { AuthService } from './core/services/auth/auth.service';
   imports: [RouterOutlet, HttpClientModule, CommonModule],
   providers: [AuthService],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.css',
 })
 export class App {
   protected readonly title = signal('front-end');

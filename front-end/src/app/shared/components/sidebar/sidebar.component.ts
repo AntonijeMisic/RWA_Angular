@@ -14,10 +14,9 @@ import * as AuthActions from '../../../store/auth/auth.actions';
   standalone: true,
   imports: [RouterModule, CommonModule],
   templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.css']
+  styleUrls: ['./sidebar.component.css'],
 })
 export class SidebarComponent {
-
   currentUser = signal<User | null>(null);
   isAdmin = signal(false);
 
@@ -29,7 +28,7 @@ export class SidebarComponent {
 
     effect(() => {
       const user = currentUserSignal();
-      if(user) {
+      if (user) {
         this.currentUser.set(user);
         this.isAdmin.set(!!user && user.userRole?.roleName === 'Admin');
       }

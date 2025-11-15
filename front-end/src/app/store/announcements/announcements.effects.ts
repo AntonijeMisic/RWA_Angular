@@ -14,10 +14,10 @@ export class AnnouncementsEffects {
       ofType(AnnouncementsActions.loadAnnouncements),
       exhaustMap(() =>
         this.announcementService.getAllAnnouncements().pipe(
-          map(announcements =>
+          map((announcements) =>
             AnnouncementsActions.loadAnnouncementsSuccess({ announcements })
           ),
-          catchError(error =>
+          catchError((error) =>
             of(AnnouncementsActions.loadAnnouncementsFailure({ error }))
           )
         )
@@ -30,10 +30,10 @@ export class AnnouncementsEffects {
       ofType(AnnouncementsActions.loadAnnouncementById),
       exhaustMap(({ id }) =>
         this.announcementService.getAnnouncementById(id).pipe(
-          map(announcement =>
+          map((announcement) =>
             AnnouncementsActions.loadAnnouncementByIdSuccess({ announcement })
           ),
-          catchError(error =>
+          catchError((error) =>
             of(AnnouncementsActions.loadAnnouncementByIdFailure({ error }))
           )
         )
@@ -46,10 +46,12 @@ export class AnnouncementsEffects {
       ofType(AnnouncementsActions.createAnnouncement),
       exhaustMap(({ announcement }) =>
         this.announcementService.create(announcement).pipe(
-          map(newAnn =>
-            AnnouncementsActions.createAnnouncementSuccess({ announcement: newAnn })
+          map((newAnn) =>
+            AnnouncementsActions.createAnnouncementSuccess({
+              announcement: newAnn,
+            })
           ),
-          catchError(error =>
+          catchError((error) =>
             of(AnnouncementsActions.createAnnouncementFailure({ error }))
           )
         )
@@ -62,10 +64,12 @@ export class AnnouncementsEffects {
       ofType(AnnouncementsActions.updateAnnouncement),
       exhaustMap(({ announcement }) =>
         this.announcementService.update(announcement).pipe(
-          map(updated =>
-            AnnouncementsActions.updateAnnouncementSuccess({ announcement: updated })
+          map((updated) =>
+            AnnouncementsActions.updateAnnouncementSuccess({
+              announcement: updated,
+            })
           ),
-          catchError(error =>
+          catchError((error) =>
             of(AnnouncementsActions.updateAnnouncementFailure({ error }))
           )
         )
@@ -79,7 +83,7 @@ export class AnnouncementsEffects {
       exhaustMap(({ id }) =>
         this.announcementService.delete(id).pipe(
           map(() => AnnouncementsActions.deleteAnnouncementSuccess({ id })),
-          catchError(error =>
+          catchError((error) =>
             of(AnnouncementsActions.deleteAnnouncementFailure({ error }))
           )
         )
