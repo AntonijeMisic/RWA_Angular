@@ -1,12 +1,10 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { map, Observable, take, tap } from 'rxjs';
+import { Observable } from 'rxjs';
 import { User } from '../../models/user.model';
 import { environment } from '../../../../environments/environment';
 import { AppState } from '../../../store/app.state';
 import { Store } from '@ngrx/store';
-import * as UsersActions from '../../../store/users/users.actions';
-import { selectUserById } from '../../../store/users/users.selectors';
 import { UserRole } from '../../models/lookups.model';
 import { UserFilterDto } from '../../dtos/userFilter.dto.';
 
@@ -20,23 +18,11 @@ export class UserService {
   currentUserRole = signal<UserRole | null>(null);
 
   register(user: User): Observable<User> {
-    const token = localStorage.getItem(environment.accessTokenKey); //dodaj interceptor za auth
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-    });
-    return this.http.post<User>(`${environment.apiUrl}/auth/register`, user, {
-      headers,
-    });
+    return this.http.post<User>(`${environment.apiUrl}/auth/register`, user);
   }
 
   update(user: User): Observable<User> {
-    const token = localStorage.getItem(environment.accessTokenKey);
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-    });
-    return this.http.post<User>(`${environment.apiUrl}/users/update`, user, {
-      headers,
-    });
+    return this.http.post<User>(`${environment.apiUrl}/users/update`, user, {});
   }
 
   getUserId(): number | null {
@@ -44,30 +30,7 @@ export class UserService {
     return userId ? Number(userId) : null;
   }
 
-  getUserRole(): UserRole | null {
-    const userId = this.getUserId();
-    this.store
-      .select(selectUserById(userId))
-      .pipe(
-        take(1),
-        tap((user) => {
-          if (!user) {
-            this.store.dispatch(UsersActions.loadUserById({ userId }));
-          }
-        }),
-        map((user) => user?.userRole ?? null)
-      )
-      .subscribe((role) => this.currentUserRole.set(role));
-
-    return this.currentUserRole();
-  }
-
   getAllUsers(filter?: Partial<UserFilterDto>): Observable<User[]> {
-    const token = localStorage.getItem(environment.accessTokenKey);
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-    });
-
     let params = new HttpParams();
     if (filter) {
       if (filter.firstName) params = params.set('firstName', filter.firstName);
@@ -80,28 +43,15 @@ export class UserService {
     }
 
     return this.http.get<User[]>(`${environment.apiUrl}/users`, {
-      headers,
       params,
     });
   }
 
   getUserById(id: number): Observable<User> {
-    const token = localStorage.getItem(environment.accessTokenKey);
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-    });
-    return this.http.get<User>(`${environment.apiUrl}/users/${id}`, {
-      headers,
-    });
+    return this.http.get<User>(`${environment.apiUrl}/users/${id}`);
   }
 
   deleteUser(userId: number): Observable<void> {
-    const token = localStorage.getItem(environment.accessTokenKey);
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-    });
-    return this.http.delete<void>(`${environment.apiUrl}/users/${userId}`, {
-      headers,
-    });
+    return this.http.delete<void>(`${environment.apiUrl}/users/${userId}`);
   }
 }

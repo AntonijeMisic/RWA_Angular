@@ -9,58 +9,30 @@ export class AnnouncementService {
   constructor(private http: HttpClient) {}
 
   getAllAnnouncements(): Observable<Announcement[]> {
-    const token = localStorage.getItem(environment.accessTokenKey);
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-    });
-    return this.http.get<Announcement[]>(
-      `${environment.apiUrl}/announcements`,
-      { headers }
-    );
+    return this.http.get<Announcement[]>(`${environment.apiUrl}/announcements`);
   }
 
   getAnnouncementById(id: number): Observable<Announcement> {
-    const token = localStorage.getItem(environment.accessTokenKey);
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-    });
     return this.http.get<Announcement>(
-      `${environment.apiUrl}/announcements/${id}`,
-      { headers }
+      `${environment.apiUrl}/announcements/${id}`
     );
   }
 
   create(announcement: Partial<Announcement>): Observable<Announcement> {
-    const token = localStorage.getItem(environment.accessTokenKey);
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-    });
     return this.http.post<Announcement>(
       `${environment.apiUrl}/announcements`,
-      announcement,
-      { headers }
+      announcement
     );
   }
 
   update(announcement: Partial<Announcement>): Observable<Announcement> {
-    const token = localStorage.getItem(environment.accessTokenKey);
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-    });
     return this.http.put<Announcement>(
       `${environment.apiUrl}/announcements/${announcement.announcementId}`,
-      announcement,
-      { headers }
+      announcement
     );
   }
 
   delete(id: number): Observable<void> {
-    const token = localStorage.getItem(environment.accessTokenKey);
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-    });
-    return this.http.delete<void>(`${environment.apiUrl}/announcements/${id}`, {
-      headers,
-    });
+    return this.http.delete<void>(`${environment.apiUrl}/announcements/${id}`);
   }
 }

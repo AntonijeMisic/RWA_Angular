@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { LookupsService } from './core/services/lookups/lookups.service';
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideEffects } from '@ngrx/effects';
@@ -22,6 +22,7 @@ import { workLogsReducer } from './store/workLogs/workLogs.reducer';
 import { WorkLogsEffects } from './store/workLogs/workLogs.effects';
 import { leaveRequestReducer } from './store/leave-requests/leave-requests.reducer';
 import { LeaveRequestEffects } from './store/leave-requests/leave-requests.effects';
+import { environment } from '../environments/environment';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -32,7 +33,24 @@ export const appConfig: ApplicationConfig = {
       lookupsService.setLookups(lookups);
       appService.initCurrentUser();
     }),
-    provideHttpClient(withFetch()),
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([
+        (req, next) => {
+          const token = localStorage.getItem(environment.accessTokenKey);
+
+          if (token) {
+            req = req.clone({
+              setHeaders: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+          }
+
+          return next(req);
+        },
+      ])
+    ),
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),

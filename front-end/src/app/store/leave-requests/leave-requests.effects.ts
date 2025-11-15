@@ -83,24 +83,6 @@ export class LeaveRequestEffects {
     )
   );
 
-  deleteLeaveRequest$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(LeaveRequestActions.deleteLeaveRequest),
-      exhaustMap((action) =>
-        this.leaveRequestService.deleteRequest(action.requestId).pipe(
-          map(() =>
-            LeaveRequestActions.deleteLeaveRequestSuccess({
-              requestId: action.requestId,
-            })
-          ),
-          catchError((error) =>
-            of(LeaveRequestActions.deleteLeaveRequestFailure({ error }))
-          )
-        )
-      )
-    )
-  );
-
   updateLeaveRequestStatus$ = createEffect(() =>
     this.actions$.pipe(
       ofType(LeaveRequestActions.updateLeaveRequestStatus),
