@@ -70,6 +70,39 @@
 .btn.small{padding:6px 8px;border-radius:6px;font-size:14px}
 .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--muted)}
 
+/* Existing button styles */
+.btn{
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn.small {
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.btn.ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--muted);
+}
+
+.btn:disabled,
+.btn.small:disabled,
+.btn.ghost:disabled {
+  opacity: 0.5;          /* vizuelno “sivo” */
+  cursor: not-allowed;    /* pokazuje zabranu klika */
+  pointer-events: none;   /* potpuno blokira klik */
+}
+
 /* Table */
 .attendance-table-wrap{
   margin-top: 30px;
@@ -142,6 +175,14 @@
 /* small polish */
 .attendance-table td input:disabled, .attendance-table td select:disabled, .inp-note:disabled{
   background:#faf7f3;color:#999;
+}
+
+.attendance-table tbody tr {
+  background-color: white;
+}
+
+.attendance-table tbody tr:hover {
+  background-color: #faf3ed;
 }
 
 .clock-in {

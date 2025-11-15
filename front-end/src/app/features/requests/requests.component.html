@@ -13,7 +13,7 @@
     </div>
   </header>
 
-  <div class="requests-cards">
+  <div class="requests-cards" *ngIf="leaveRequests$ | async as leaveRequests">
     <div *ngFor="let req of leaveRequests | filter:searchText | statusFilter:filterStatus" class="request-card">
       <div class="card-header">
         <div class="employee-name">{{ req.user.firstName }} {{ req.user.lastName }}</div>
@@ -28,7 +28,7 @@
         <p><strong>Note:</strong> {{ req.note || '-' }}</p>
       </div>
 
-      <div class="card-actions" *ngIf="isAdmin">
+      <div class="card-actions">
         <button class="btn approve-btn" (click)="approveRequest(req)">
           <i class="fas fa-check"></i> Approve
         </button>

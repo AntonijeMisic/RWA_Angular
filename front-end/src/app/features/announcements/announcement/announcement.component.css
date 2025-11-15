@@ -85,6 +85,7 @@ select option[value=""] {
   background-color: #8c5c3a;
 }
 
+
 @media (max-width: 480px) {
   .profile-wrapper {
     padding: 20px;

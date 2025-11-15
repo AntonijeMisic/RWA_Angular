@@ -1,0 +1,18 @@
+<div class="dialog-backdrop">
+  <div class="dialog-box">
+    <h3>Select Work Type</h3>
+
+    <div class="form-row">
+      <label for="workType">Work Type</label>
+      <select id="workType" [(ngModel)]="selectedWorkTypeId">
+        <option value="" disabled>Select a work type</option>
+        <option *ngFor="let type of workTypes" [value]="type.workTypeId">{{ type.workTypeName }}</option>
+      </select>
+    </div>
+
+    <div class="dialog-actions">
+      <button class="btn cancel" (click)="cancel()">Cancel</button>
+      <button class="btn confirm" (click)="confirm()" [disabled]="!selectedWorkTypeId">Confirm</button>
+    </div>
+  </div>
+</div>

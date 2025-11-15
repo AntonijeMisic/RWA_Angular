@@ -1,17 +1,28 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { Observable, combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { AppState } from '../../store/app.state';
+import { LeaveRequest } from '../../core/models/leaveRequest.model';
+import { LeaveType, RequestStatus } from '../../core/models/lookups.model';
+import { loadUserLeaveRequests, loadLeaveTypes, createLeaveRequest } from '../../store/leave-requests/leave-requests.actions';
+import { selectAllLeaveRequestsByUser, selectLeaveTypes } from '../../store/leave-requests/leave-requests.selectors';
+import { selectCurrentUser } from '../../store/users/users.selectors';
+import { LeaveRequestDialogComponent } from './leave-request-dialog/leave-request-dialog.component';
 
 interface Day {
   date: number;
   isPast: boolean;
   selected: boolean;
   monthIndex: number;
-  absenceType?: 'Vacation' | 'Sick' | 'Remote'; // imam lookup za tip odsustva
+  absenceType?: LeaveType;
+  requestStatus?: RequestStatus;
+  requestId?: number;
   isRangeStart?: boolean;
   isRangeEnd?: boolean;
   isRangeMiddle?: boolean;
 }
-
 
 interface Month {
   name: string;
@@ -21,65 +32,111 @@ interface Month {
 @Component({
   selector: 'app-vacation-schedule',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LeaveRequestDialogComponent],
   templateUrl: './vacation-schedule.component.html',
   styleUrls: ['./vacation-schedule.component.css']
 })
 export class VacationScheduleComponent implements OnInit {
   currentYear = new Date().getFullYear();
   weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
   months: Month[] = [];
 
-  // za range selekciju
+  private store = inject(Store<AppState>);
+
+  currentUserId = signal<number | null>(null);
+  showLeaveDialog = signal(false);
+
+  leaveRequests$: Observable<LeaveRequest[]> = this.store.select(
+    selectAllLeaveRequestsByUser
+  );
+  leaveTypes$: Observable<LeaveType[]> = this.store.select(
+    selectLeaveTypes
+  );
+
   private firstSelectedDay: Day | null = null;
+
 
   ngOnInit() {
     this.generateMonths();
-  }
 
-  generateMonths() {
-    const monthNames = [
-      'January','February','March','April','May','June','July','August','September','October','November','December'
-    ];
-
-    for (let i = 0; i < 12; i++) {
-      const daysInMonth = new Date(this.currentYear, i + 1, 0).getDate();
-      const month: Month = {
-        name: monthNames[i],
-        days: []
-      };
-
-      for (let d = 1; d <= daysInMonth; d++) {
-        const dateObj = new Date(this.currentYear, i, d);
-        month.days.push({
-          date: d,
-          isPast: dateObj < new Date(),
-          selected: false,
-          monthIndex: i
-        });
+    // učitaj leaveRequests i leaveTypes iz store-a
+    combineLatest([
+      this.store.select(selectCurrentUser)
+    ]).pipe(
+      map(([user]) => user)
+    ).subscribe(user => {
+      if (user) {
+         this.currentUserId.set(user.userId);
+        this.store.dispatch(loadUserLeaveRequests({ userId: user.userId! }));
+        this.store.dispatch(loadLeaveTypes());
       }
+    });
 
-      this.months.push(month);
-    }
+    // mapiranje leaveRequests na dane u kalendaru
+    this.leaveRequests$.subscribe(requests => {
+      this.clearAllSelections(false); // ne brisemo lokalnu selekciju, samo status
+      this.applyRequestsToCalendar(requests);
+    });
   }
+
+  private getUserId(): number | null { return this.currentUserId(); }
+
+  private generateMonths() {
+  const monthNames = [
+    'January','February','March','April','May','June',
+    'July','August','September','October','November','December'
+  ];
+
+  const today = new Date();
+
+  for (let i = 0; i < 12; i++) {
+    const daysInMonth = new Date(this.currentYear, i + 1, 0).getDate();
+    const month: Month = { name: monthNames[i], days: [] };
+
+    // prvi dan u mesecu
+    const firstDayOfMonth = new Date(this.currentYear, i, 1);
+    const startWeekDay = firstDayOfMonth.getDay(); // 0 = Sunday, 1 = Monday ...
+
+    // dodajemo prazne dane pre prvog dana u mesecu
+    for (let j = 0; j < startWeekDay; j++) {
+      month.days.push({
+        date: 0,       // prazna ćelija
+        isPast: false,
+        selected: false,
+        monthIndex: i
+      });
+    }
+
+    // dodajemo stvarne dane
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateObj = new Date(this.currentYear, i, d);
+      month.days.push({
+        date: d,
+        isPast: dateObj < today,
+        selected: false,
+        monthIndex: i
+      });
+    }
+
+    this.months.push(month);
+  }
+}
+
 
   selectDay(day: Day) {
-    if (day.isPast) return;
+    if (day.isPast || day.requestStatus) return;
 
     if (!this.firstSelectedDay) {
-      // prvi klik - start range
       this.firstSelectedDay = day;
       day.selected = true;
       day.isRangeStart = true;
     } else {
-      // kraj range
       const startMonth = this.firstSelectedDay.monthIndex;
       const endMonth = day.monthIndex;
       const startDate = this.firstSelectedDay.date;
       const endDate = day.date;
 
-      this.clearAllSelections();
+      this.clearAllSelections(true);
 
       for (let m = startMonth; m <= endMonth; m++) {
         this.months[m].days.forEach(d => {
@@ -91,7 +148,6 @@ export class VacationScheduleComponent implements OnInit {
             else if (m > startMonth && m < endMonth) d.selected = true;
           }
 
-          // označavanje početka, sredine i kraja range-a
           if (d.selected) {
             d.isRangeStart = (m === startMonth && d.date === startDate);
             d.isRangeEnd = (m === endMonth && d.date === endDate);
@@ -100,39 +156,139 @@ export class VacationScheduleComponent implements OnInit {
         });
       }
 
-      // pokaži popup za izbor tipa odsustva
-      this.showAbsenceTypePopup(day);
-
+      this.showLeaveDialog.set(true);
       this.firstSelectedDay = null;
     }
   }
 
-  showAbsenceTypePopup(day: Day) {
-    // Ovde možeš da prikažeš modal/tooltip
-    // Za primer, koristi prompt (za demo)
-    const type = prompt('Select absence type: Vacation, Sick, Remote', 'Vacation');
-    if (type === 'Vacation' || type === 'Sick' || type === 'Remote') {
-      this.applyAbsenceTypeToSelected(type);
+  onLeaveDialogConfirm(data: { leaveTypeId: number; note?: string }) {
+
+    const startDay = this.getFirstSelectedDay();
+    const endDay = this.getLastSelectedDay();
+
+    if (!startDay || !endDay) return;
+
+    const overlap = this.hasOverlapWithExistingRequests(startDay, endDay);
+    if (overlap) {
+      alert('Selected range overlaps with existing leave requests.');
+      this.clearAllSelections(true);
+      this.firstSelectedDay = null;
+      return;
     }
+
+    this.store.dispatch(
+      createLeaveRequest({
+        dto: {
+          userId: this.getUserId()!,
+          leaveTypeId: data.leaveTypeId,
+          startDate: new Date(this.currentYear, startDay.monthIndex, startDay.date),
+          endDate: new Date(this.currentYear, endDay.monthIndex, endDay.date),
+          note: data.note
+        }
+      })
+    );
+
+    this.showLeaveDialog.set(false);
   }
 
-  applyAbsenceTypeToSelected(type: 'Vacation' | 'Sick' | 'Remote') {
+  onLeaveDialogCancel() {
+    this.showLeaveDialog.set(false);
+    this.cancelSelection();
+  }
+
+  private getFirstSelectedDay(): Day | null {
+    for (const m of this.months) {
+      for (const d of m.days) if (d.selected) return d;
+    }
+    return null;
+  }
+
+  private getLastSelectedDay(): Day | null {
+    for (let i = this.months.length - 1; i >= 0; i--) {
+      for (let j = this.months[i].days.length - 1; j >= 0; j--) {
+        if (this.months[i].days[j].selected) return this.months[i].days[j];
+      }
+    }
+    return null;
+  }
+
+  private clearAllSelections(clearVisual: boolean = true) {
     this.months.forEach(m =>
       m.days.forEach(d => {
-        if (d.selected) d.absenceType = type;
+        if (clearVisual) {
+          d.selected = false;
+          d.isRangeStart = false;
+          d.isRangeEnd = false;
+          d.isRangeMiddle = false;
+        }
       })
     );
   }
 
-  private clearAllSelections() {
+  private cancelSelection() {
     this.months.forEach(m =>
       m.days.forEach(d => {
-        d.selected = false;
-        d.isRangeStart = false;
-        d.isRangeEnd = false;
-        d.isRangeMiddle = false;
-        d.absenceType = undefined;
+        if (d.selected && !d.requestStatus) {
+          d.selected = false;
+          d.isRangeStart = false;
+          d.isRangeEnd = false;
+          d.isRangeMiddle = false;
+          d.absenceType = undefined;
+        }
       })
     );
+    this.firstSelectedDay = null;
+  }
+
+  private applyRequestsToCalendar(requests: LeaveRequest[]) {
+    requests.forEach(req => {
+      const start = new Date(req.startDate);
+      const end = new Date(req.endDate);
+
+      for (let m = start.getMonth(); m <= end.getMonth(); m++) {
+        const startDateOnly = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+        const endDateOnly = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+
+        this.months[m].days.forEach(d => {
+          if (d.date === 0) return; // preskoči prazne ćelije
+
+          const dayDate = new Date(this.currentYear, m, d.date);
+
+          if (dayDate >= startDateOnly && dayDate <= endDateOnly) {
+            d.absenceType = req.leaveType;
+            d.requestStatus = req.requestStatus;
+            d.requestId = req.requestId;
+          }
+        });
+      }
+    });
+  }
+
+  private hasOverlapWithExistingRequests(startDay: Day, endDay: Day): boolean {
+    const startDate = new Date(this.currentYear, startDay.monthIndex, startDay.date);
+    const endDate = new Date(this.currentYear, endDay.monthIndex, endDay.date);
+
+    for (const month of this.months) {
+      for (const d of month.days) {
+        if (d.date === 0) continue;
+        const current = new Date(this.currentYear, d.monthIndex, d.date);
+        if (current >= startDate && current <= endDate && d.requestStatus) {
+          return true; // overlap detected
+        }
+      }
+    }
+
+    return false;
+  }
+
+  // opcionalno: funkcija za bojenje dana
+  getDayColor(day: Day) {
+    if (!day.requestStatus) return '';
+    switch (day.requestStatus.requestStatusName) {
+      case 'Pending': return 'orange';
+      case 'Approved': return 'green';
+      case 'Rejected': return 'red';
+      default: return '';
+    }
   }
 }

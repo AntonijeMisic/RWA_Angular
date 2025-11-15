@@ -1,15 +1,6 @@
 <div class="attendance-wrapper">
   <header class="attendance-header">
     <h2>Attendance - Weekly Overview</h2>
-    <div class="attendance-controls">
-      <label>
-        Employee:
-        <select>
-          <option>John Doe</option>
-          <option>Jane Smith</option>
-        </select>
-      </label>
-    </div>
   </header>
 
   <div class="attendance-table-wrap">
@@ -18,127 +9,58 @@
         <tr>
           <th>Date</th>
           <th>Day</th>
-          <th>Day off</th>
           <th>Start</th>
           <th>End</th>
           <th>Break (min)</th>
           <th>Work Type</th>
           <th>Total hrs</th>
           <th>Note</th>
-          <th></th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        <!-- Monday - today -->
-        <tr>
-          <td>04.11.2025</td>
-          <td>Mon</td>
-          <td>No</td>
-          <td>09:00</td>
-          <td>17:00</td>
-          <td>30</td>
-          <td>Office</td>
-          <td>8</td>
-          <td>-</td>
+        <tr *ngFor="let item of weeklyLogs()">
+          <td>{{ item.day | date: 'dd.MM.yyyy' }}</td>
+          <td>{{ item.day | date: 'EEE' }}</td>
+          <td>{{ item.log?.clockIn ? (item.log?.clockIn | date:'HH:mm:ss') : '-' }}</td>
+          <td>{{ item.log?.clockOut ? (item.log?.clockOut | date:'HH:mm:ss') : '-' }}</td>
+          <td>{{ item.log?.breakMinutes ? (item.log?.breakMinutes | number:'1.2-2') : (item.isWeekend || item.isLeave ? '-' : '0.00') }}</td>
+          <td>{{ item.log?.workType?.workTypeName || '-' }}</td>
+          <td>{{ convertTotalHoursToHHMMSS(item.log?.totalHours) }}</td>
+          <td>{{ item.isLeave ? 'Day off' + ' - ' + item.leaveType : '-'}}</td>
           <td>
-            <button class="btn small clock-in">Clock In</button>
-            <button class="btn small clock-out">Clock Out</button>
-            <button class="btn small break-btn">Take a break</button>
+            <div *ngIf="item.isToday && !item.isWeekend && !item.isLeave; else emptyCell">
+              <button class="btn small clock-in"
+                      (click)="openWorkTypeDialog(item.day)"
+                      [disabled]="item.isWeekend || item.log?.clockIn">
+                Clock In
+              </button>
+
+              <button class="btn small clock-out"
+                      (click)="clockOut(item.day)"
+                      [disabled]="item.isWeekend || !item.log?.clockIn || item.log?.clockOut">
+                Clock Out
+              </button>
+
+              <button class="btn small break-btn"
+                      (click)="takeBreak(item.day)"
+                      [disabled]="item.isWeekend || !item.log?.clockIn || item.log?.clockOut || item.log?.breakMinutes">
+                {{ isOnBreak() ? 'Resume Work' : 'Take a Break' }}
+              </button>
+            </div>
+
+            <ng-template #emptyCell>
+              <span class="muted">-</span>
+            </ng-template>
           </td>
-        </tr>
-
-        <!-- Tuesday -->
-        <tr>
-          <td>05.11.2025</td>
-          <td>Tue</td>
-          <td>No</td>
-          <td>09:00</td>
-          <td>17:00</td>
-          <td>30</td>
-          <td>Remote</td>
-          <td>8</td>
-          <td>-</td>
-          <td>
-            <button class="btn small leave-btn">Request Leave</button>
-          </td>
-        </tr>
-
-        <!-- Wednesday -->
-        <tr>
-          <td>06.11.2025</td>
-          <td>Wed</td>
-          <td>No</td>
-          <td>09:00</td>
-          <td>17:00</td>
-          <td>30</td>
-          <td>Office</td>
-          <td>8</td>
-          <td>-</td>
-          <td>
-            <button class="btn small leave-btn">Request Leave</button>
-          </td>
-        </tr>
-
-        <!-- Thursday -->
-        <tr>
-          <td>07.11.2025</td>
-          <td>Thu</td>
-          <td>No</td>
-          <td>09:00</td>
-          <td>17:00</td>
-          <td>30</td>
-          <td>Remote</td>
-          <td>8</td>
-          <td>-</td>
-          <td>
-            <button class="btn small leave-btn">Request Leave</button>
-          </td>
-        </tr>
-
-        <!-- Friday -->
-        <tr>
-          <td>08.11.2025</td>
-          <td>Fri</td>
-          <td>No</td>
-          <td>09:00</td>
-          <td>17:00</td>
-          <td>30</td>
-          <td>Office</td>
-          <td>8</td>
-          <td>-</td>
-          <td>
-            <button class="btn small leave-btn">Request Leave</button>
-          </td>
-        </tr>
-
-        <!-- Saturday -->
-        <tr class="muted">
-          <td>09.11.2025</td>
-          <td>Sat</td>
-          <td>Yes</td>
-          <td>-</td>
-          <td>-</td>
-          <td>-</td>
-          <td>-</td>
-          <td>0</td>
-          <td>Day off</td>
-          <td></td>
-        </tr>
-
-        <!-- Sunday -->
-        <tr class="muted">
-          <td>10.11.2025</td>
-          <td>Sun</td>
-          <td>Yes</td>
-          <td>-</td>
-          <td>-</td>
-          <td>-</td>
-          <td>-</td>
-          <td>0</td>
-          <td>Day off</td>
-          <td></td>
         </tr>
       </tbody>
     </table>
   </div>
 </div>
+
+<app-work-log-dialog
+  *ngIf="showWorkTypeDialog"
+  (confirmSelection)="onWorkTypeSelected($event)"
+  (cancelSelection)="onWorkTypeDialogCancel()">
+</app-work-log-dialog>

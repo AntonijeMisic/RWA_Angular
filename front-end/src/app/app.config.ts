@@ -12,6 +12,10 @@ import { usersReducer } from './store/users/users.reducer';
 import { AppInitService } from './app.service';
 import { AnnouncementsEffects } from './store/announcements/announcements.effects';
 import { announcementsReducer } from './store/announcements/announcements.reducer';
+import { workLogsReducer } from './store/workLogs/workLogs.reducer';
+import { WorkLogsEffects } from './store/workLogs/workLogs.effects';
+import { leaveRequestReducer } from './store/leave-requests/leave-requests.reducer';
+import { LeaveRequestEffects } from './store/leave-requests/leave-requests.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -28,9 +32,11 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideStore({
       users: usersReducer,
-      announcements: announcementsReducer
+      announcements: announcementsReducer,
+      workLogs: workLogsReducer,
+      leaveRequests: leaveRequestReducer
     }),
     provideStoreDevtools({ maxAge: 25 }),
-    provideEffects([UsersEffects, AnnouncementsEffects]),
+    provideEffects([UsersEffects, AnnouncementsEffects, WorkLogsEffects, LeaveRequestEffects]),
   ]
 };

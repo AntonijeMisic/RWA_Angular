@@ -1,5 +1,6 @@
 import { createReducer, on } from '@ngrx/store';
 import * as AnnouncementsActions from './announcements.actions';
+import * as AuthActions from '../auth/auth.actions';
 import { Announcement } from '../../core/models/announcement.model';
 
 export interface AnnouncementsState {
@@ -49,6 +50,7 @@ export const announcementsReducer = createReducer(
   on(AnnouncementsActions.loadAnnouncementByIdFailure, (state, { error }) => ({
     ...state,
     loading: false,
+    selectedAnnouncement: null,
     error
   })),
   on(AnnouncementsActions.createAnnouncementSuccess, (state, { announcement }) => ({
@@ -68,5 +70,6 @@ export const announcementsReducer = createReducer(
     ...state,
     announcements: state.announcements.filter(a => a.announcementId !== id),
     selectedAnnouncement: state.selectedAnnouncement?.announcementId === id ? null : state.selectedAnnouncement
-  }))
+  })),
+  on(AuthActions.logout, () => initialState)
 );

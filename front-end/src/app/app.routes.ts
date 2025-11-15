@@ -30,7 +30,7 @@ export const routes: Routes = [
       { path: 'users', component: UsersListComponent },
       { path: 'profile/:id', component: ProfileComponent },
       { path: 'profile', component: ProfileComponent },
-      { path: 'requests', component: RequestsComponent },
+      { path: 'requests', component: RequestsComponent, canActivate: [AdminGuard]  },
       // ostali child routovi
     ],
   },

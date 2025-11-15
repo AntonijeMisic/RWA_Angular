@@ -7,6 +7,7 @@ import { AuthService } from '../../../core/services/auth/auth.service';
 import { AppState } from '../../../store/app.state';
 import { selectCurrentUser } from '../../../store/users/users.selectors';
 import { User } from '../../../core/models/user.model';
+import * as AuthActions from '../../../store/auth/auth.actions';
 
 @Component({
   selector: 'app-sidebar',
@@ -36,6 +37,7 @@ export class SidebarComponent {
   }
 
   onLogout(): void {
+    this.store.dispatch(AuthActions.logout());
     this.authService.logout();
   }
 }

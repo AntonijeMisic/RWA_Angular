@@ -1,6 +1,7 @@
 .login-container {
   display: flex;
   justify-content: center;
+  background-color: #fdf9f4;
   align-items: center;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   height: 98vh;

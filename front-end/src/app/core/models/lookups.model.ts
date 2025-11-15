@@ -18,9 +18,15 @@ export interface RequestStatus {
   requestStatusName: string;
 }
 
+export interface WorkType {
+  workTypeId: number;
+  workTypeName: string;
+}
+
 export interface LookupEntities {
   userRoles: UserRole[];
   userPositions: UserPosition[];
   leaveTypes: LeaveType[];
+  workTypes: WorkType[];
   requestStatuses: RequestStatus[];
 }

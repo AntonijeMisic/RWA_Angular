@@ -48,6 +48,7 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 5px;
+  justify-items: center; /* centriranje dana u koloni */
 }
 
 .days-grid div {
@@ -72,6 +73,11 @@
 .day-selected {
   background-color: #a97451;
   color: white;
+}
+
+.day-empty {
+  cursor: default;
+  background-color: transparent;
 }
 
 /* --- RESPONSIVE --- */

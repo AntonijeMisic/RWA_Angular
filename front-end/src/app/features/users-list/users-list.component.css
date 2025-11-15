@@ -132,6 +132,16 @@
   background-color: #faf3ed;
 }
 
+.userlist-table tbody tr {
+  background-color: white;
+}
+
+/* Hover efekat za red */
+.userlist-table tbody tr:hover {
+  background-color: #faf3ed; /* ista svetlo-bež boja kao drugde */
+  transition: background-color 0.2s ease;
+}
+
 /* Responsive podešavanja za mobilni prikaz */
 @media (max-width: 920px) {
   .userlist-table-wrap {

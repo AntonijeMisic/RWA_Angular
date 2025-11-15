@@ -1,122 +1,69 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { LeaveRequest, } from '../../core/models/leaveRequest.model';
-import { User } from '../../core/models/user.model';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Store } from '@ngrx/store';
+import { combineLatest, map, Observable } from 'rxjs';
+
+import { LeaveRequest, UpdateStatusDto } from '../../core/models/leaveRequest.model';
+import { RequestStatus } from '../../core/models/lookups.model';
+import { LookupsService } from '../../core/services/lookups/lookups.service';
 import { FilterPipe } from './filter.pipe';
 import { StatusFilterPipe } from './status-filter.pipe';
-import { LeaveType, RequestStatus } from '../../core/models/lookups.model';
-import { LookupsService } from '../../core/services/lookups/lookups.service';
-import { UserService } from '../../core/services/user/user.service';
+import { selectCurrentUser } from '../../store/users/users.selectors';
+import { selectAllLeaveRequests } from '../../store/leave-requests/leave-requests.selectors';
+import { loadLeaveRequests, updateLeaveRequestStatus } from '../../store/leave-requests/leave-requests.actions';
 
 @Component({
-  selector: 'app-requests.component',
+  selector: 'app-requests',
+  standalone: true,
   imports: [CommonModule, FormsModule, FilterPipe, StatusFilterPipe],
   templateUrl: './requests.component.html',
   styleUrl: './requests.component.css'
 })
 export class RequestsComponent implements OnInit {
 
+  private store = inject(Store);
   private lookupService = inject(LookupsService);
-  private userService = inject(UserService);
 
-  leaveRequests: LeaveRequest[] = [];
+  currentUserId = signal<number | null>(null);
+
+  leaveRequests$: Observable<LeaveRequest[]> = this.store.select(selectAllLeaveRequests);
+
   requestStatuses: RequestStatus[] = [];
-  isAdmin = false;
-  searchText: string = '';
+  searchText = '';
   filterStatus: number | null = null;
 
   ngOnInit(): void {
-    const role = this.userService.getUserRole();
-    this.isAdmin = role?.roleName === 'Admin';
     this.requestStatuses = this.lookupService.getLookups().requestStatuses;
-    const admin: User = {
-      userId: 1,
-      firstName: 'Admin',
-      lastName: 'User',
-      email: 'admin@example.com',
-      password: 'adminpass',
-      userRoleId: 1,
-      userRole: { roleName: 'Admin' } as any,
-      userPositionId: 1,
-      userPosition: { userPositionName: 'Manager' } as any,
-      startDate: new Date('2020-01-01')
-    };
-
-    const employee1: User = {
-      userId: 2,
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john@example.com',
-      password: 'johnpass',
-      userRoleId: 2,
-      userRole: { roleName: 'Employee' } as any,
-      userPositionId: 2,
-      userPosition: { userPositionName: 'Developer' } as any,
-      startDate: new Date('2021-05-10')
-    };
-
-    const leaveAnnual: LeaveType = { leaveTypeId: 1, leaveTypeName: 'Annual Leave' };
-    const leaveSick: LeaveType = { leaveTypeId: 2, leaveTypeName: 'Sick Leave' };
-
-    const statusPending: RequestStatus = { requestStatusId: 1, requestStatusName: 'Pending' };
-    const statusApproved: RequestStatus = { requestStatusId: 2, requestStatusName: 'Approved' };
-
-    this.leaveRequests = [
-      {
-        requestId: 1,
-        user: employee1,
-        leaveType: leaveAnnual,
-        startDate: new Date('2025-11-10'),
-        endDate: new Date('2025-11-14'),
-        requestStatus: statusPending,
-        approver: null,
-        requestDate: new Date('2025-11-01'),
-        note: 'Family trip'
-      },
-      {
-        requestId: 2,
-        user: employee1,
-        leaveType: leaveSick,
-        startDate: new Date('2025-11-03'),
-        endDate: new Date('2025-11-05'),
-        requestStatus: statusApproved,
-        approver: admin,
-        requestDate: new Date('2025-10-30'),
-        note: 'Flu'
-      }
-    ];
+    combineLatest([
+        this.store.select(selectCurrentUser)
+      ]).pipe(
+        map(([user]) => user)
+      ).subscribe(user => {
+        if (user) {
+          this.currentUserId.set(user.userId);
+          this.store.dispatch(loadLeaveRequests());
+        }
+    });
   }
 
+  private getUserId(): number | null { return this.currentUserId(); }
+
   approveRequest(req: LeaveRequest) {
-    req.requestStatus.requestStatusName = 'Approved';
-    req.approver = {
-      userId: 1,
-      firstName: 'Admin',
-      lastName: 'User',
-      email: 'admin@example.com',
-      password: 'adminpass',
-      userRoleId: 1,
-      userRole: { roleName: 'Admin' } as any,
-      userPositionId: 1,
-      userPosition: { userPositionName: 'Manager' } as any,
-      startDate: new Date('2020-01-01')
+    const dto: UpdateStatusDto = {
+      requestId: req.requestId,
+      approverId: this.getUserId()!,
+      statusId: 2 // Approved
     };
+    this.store.dispatch(updateLeaveRequestStatus({ dto }));
   }
 
   rejectRequest(req: LeaveRequest) {
-    req.requestStatus.requestStatusName = 'Rejected';
-    req.approver = {
-      userId: 1,
-      firstName: 'Admin',
-      lastName: 'User',
-      email: 'admin@example.com',
-      password: 'adminpass',
-      userRoleId: 1,
-      userRole: { roleName: 'Admin' } as any,
-      userPositionId: 1,
-      userPosition: { userPositionName: 'Manager' } as any,
-      startDate: new Date('2020-01-01')
+    const dto: UpdateStatusDto = {
+      requestId: req.requestId,
+      approverId: this.getUserId()!,
+      statusId: 3 // Rejected
     };
+    this.store.dispatch(updateLeaveRequestStatus({ dto }));
   }
 }
