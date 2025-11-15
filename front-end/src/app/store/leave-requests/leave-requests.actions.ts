@@ -20,7 +20,6 @@ export const loadLeaveRequestsFailure = createAction(
   props<{ error: any }>()
 );
 
-// Load Leave Requests (za usera)
 export const loadUserLeaveRequests = createAction(
   '[LeaveRequest] Load Leave Requests For User',
   props<{ userId: number }>()
@@ -51,7 +50,6 @@ export const loadApprovedLeavesForWeekFailure = createAction(
   props<{ error: string }>()
 );
 
-// Load Leave Types (lookup)
 export const loadLeaveTypes = createAction('[LeaveRequest] Load Leave Types');
 
 export const loadLeaveTypesSuccess = createAction(
@@ -64,7 +62,6 @@ export const loadLeaveTypesFailure = createAction(
   props<{ error: any }>()
 );
 
-// Create new leave request
 export const createLeaveRequest = createAction(
   '[LeaveRequest] Create Leave Request',
   props<{ dto: CreateLeaveRequest }>()
@@ -80,7 +77,6 @@ export const createLeaveRequestFailure = createAction(
   props<{ error: any }>()
 );
 
-// Delete leave request
 export const deleteLeaveRequest = createAction(
   '[LeaveRequest] Delete Leave Request',
   props<{ requestId: number }>()
@@ -96,7 +92,6 @@ export const deleteLeaveRequestFailure = createAction(
   props<{ error: any }>()
 );
 
-// Update status
 export const updateLeaveRequestStatus = createAction(
   '[LeaveRequest] Update Leave Request Status',
   props<{ dto: UpdateStatusDto }>()

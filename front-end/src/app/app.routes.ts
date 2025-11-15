@@ -20,7 +20,6 @@ export const routes: Routes = [
     component: DashboardComponent,
     canActivate: [authGuard],
     children: [
-      // default child = AttendanceComponent
       { path: '', redirectTo: 'attendance', pathMatch: 'full' },
       { path: 'attendance', component: AttendanceComponent },
       { path: 'announcements', component: AnnouncementsComponent },

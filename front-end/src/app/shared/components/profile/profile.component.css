@@ -57,7 +57,6 @@
   margin-top: 2px;
 }
 
-/* Dodato za bolju vidljivost disabled/placeholder opcije u selectu */
 select option[value=""] {
   color: #999;
 }
@@ -69,11 +68,11 @@ select option[value=""] {
 }
 
 .btn.save-btn {
-  background-color: #a97451; /* glavna boja */
+  background-color: #a97451;
   color: white;
-  border: 1px solid #e3d5c0; /* braonkasti border */
-  border-radius: 12px; /* zaobljeni uglovi */
-  padding: 12px 24px; /* veće i preglednije */
+  border: 1px solid #e3d5c0;
+  border-radius: 12px;
+  padding: 12px 24px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -81,10 +80,9 @@ select option[value=""] {
 }
 
 .btn.save-btn:hover {
-  background-color: #8c5c3a; /* tamnija nijansa */
+  background-color: #8c5c3a;
 }
 
-/* Responsive: manji ekrani */
 @media (max-width: 480px) {
   .profile-wrapper {
     padding: 20px;

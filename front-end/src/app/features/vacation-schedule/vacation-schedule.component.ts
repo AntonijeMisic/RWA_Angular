@@ -63,7 +63,6 @@ export class VacationScheduleComponent implements OnInit {
   ngOnInit() {
     this.generateMonths();
 
-    // učitaj leaveRequests i leaveTypes iz store-a
     combineLatest([this.store.select(selectCurrentUser)])
       .pipe(map(([user]) => user))
       .subscribe((user) => {
@@ -74,9 +73,8 @@ export class VacationScheduleComponent implements OnInit {
         }
       });
 
-    // mapiranje leaveRequests na dane u kalendaru
     this.leaveRequests$.subscribe((requests) => {
-      this.clearAllSelections(false); // ne brisemo lokalnu selekciju, samo status
+      this.clearAllSelections(false);
       this.applyRequestsToCalendar(requests);
     });
   }
@@ -107,21 +105,18 @@ export class VacationScheduleComponent implements OnInit {
       const daysInMonth = new Date(this.currentYear, i + 1, 0).getDate();
       const month: Month = { name: monthNames[i], days: [] };
 
-      // prvi dan u mesecu
       const firstDayOfMonth = new Date(this.currentYear, i, 1);
-      const startWeekDay = firstDayOfMonth.getDay(); // 0 = Sunday, 1 = Monday ...
+      const startWeekDay = firstDayOfMonth.getDay();
 
-      // dodajemo prazne dane pre prvog dana u mesecu
       for (let j = 0; j < startWeekDay; j++) {
         month.days.push({
-          date: 0, // prazna ćelija
+          date: 0,
           isPast: false,
           selected: false,
           monthIndex: i,
         });
       }
 
-      // dodajemo stvarne dane
       for (let d = 1; d <= daysInMonth; d++) {
         const dateObj = new Date(this.currentYear, i, d);
         month.days.push({
@@ -274,7 +269,7 @@ export class VacationScheduleComponent implements OnInit {
         );
 
         this.months[m].days.forEach((d) => {
-          if (d.date === 0) return; // preskoči prazne ćelije
+          if (d.date === 0) return;
 
           const dayDate = new Date(this.currentYear, m, d.date);
 
@@ -301,7 +296,7 @@ export class VacationScheduleComponent implements OnInit {
         if (d.date === 0) continue;
         const current = new Date(this.currentYear, d.monthIndex, d.date);
         if (current >= startDate && current <= endDate && d.requestStatus) {
-          return true; // overlap detected
+          return true;
         }
       }
     }
@@ -309,7 +304,6 @@ export class VacationScheduleComponent implements OnInit {
     return false;
   }
 
-  // opcionalno: funkcija za bojenje dana
   getDayColor(day: Day) {
     if (!day.requestStatus) return '';
     switch (day.requestStatus.requestStatusName) {

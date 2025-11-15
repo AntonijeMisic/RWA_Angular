@@ -21,10 +21,8 @@ export class LeaveRequestDialogComponent {
   note: string = '';
 
   leaveTypes: LeaveType[] = [
-    //mozemo da ih ucitamo iz lookupservice-a
     { leaveTypeId: 1, leaveTypeName: 'Vacation' },
     { leaveTypeId: 2, leaveTypeName: 'Sick' },
-    { leaveTypeId: 3, leaveTypeName: 'Remote' },
   ];
 
   confirm() {

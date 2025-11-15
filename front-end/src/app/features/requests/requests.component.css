@@ -5,7 +5,6 @@
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Header */
 .requests-header{
   display:flex;
   justify-content:space-between;
@@ -17,7 +16,6 @@
   color:var(--text);
 }
 
-/* FILTERS */
 .requests-filters {
   display: flex;
   align-items: center;
@@ -34,19 +32,18 @@
   min-width: 200px;
 }
 
-/* CARDS */
 .requests-cards {
   display: flex;
   flex-direction: column;
-  gap: 16px; /* manja udaljenost između kartica */
+  gap: 16px;
 }
 
 .request-card {
   background-color: white;
   border-radius: 10px;
-  padding: 16px; /* manji padding */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); /* blaži shadow */
-  border: 1px solid #e3d5c0; /* braonkasta linija */
+  padding: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e3d5c0;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -58,7 +55,6 @@
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
 }
 
-/* HEADER */
 .card-header {
   display: flex;
   justify-content: space-between;
@@ -92,21 +88,18 @@
   background-color: #f44336;
 }
 
-/* BODY */
 .card-body p {
   margin: 2px 0;
   color: var(--text);
   font-size: 14px;
 }
 
-/* ACTIONS */
 .card-actions {
   display: flex;
   gap: 8px;
   margin-top: 8px;
 }
 
-/* BUTTONS */
 .btn {
   padding: 6px 12px;
   border-radius: 6px;
@@ -134,7 +127,6 @@
   background-color: #f44336;
 }
 
-/* RESPONSIVE */
 @media (max-width: 700px) {
   .requests-wrapper {
     padding: 20px;

@@ -2,7 +2,6 @@ import { createAction, props } from '@ngrx/store';
 import { User } from '../../core/models/user.model';
 import { UserFilterDto } from '../../core/dtos/userFilter.dto.';
 
-// --- Set current user (async style) ---
 export const setCurrentUser = createAction(
   '[Users] Set Current User',
   props<{ userId: number }>()
@@ -18,7 +17,6 @@ export const setCurrentUserFailure = createAction(
   props<{ error: any }>()
 );
 
-// --- Update current user (async style) ---
 export const updateCurrentUser = createAction(
   '[Users] Update Current User',
   props<{ user: Partial<User> }>()
@@ -62,7 +60,6 @@ export const loadUserByIdFailure = createAction(
   props<{ error: any }>()
 );
 
-// CREATE
 export const createUser = createAction(
   '[Users] Create User',
   props<{ user: User }>()
@@ -76,7 +73,6 @@ export const createUserFailure = createAction(
   props<{ error: any }>()
 );
 
-// UPDATE
 export const updateUser = createAction(
   '[Users] Update User',
   props<{ user: User }>()
@@ -90,7 +86,6 @@ export const updateUserFailure = createAction(
   props<{ error: any }>()
 );
 
-// DELETE
 export const deleteUser = createAction(
   '[Users] Delete User',
   props<{ userId: number }>()

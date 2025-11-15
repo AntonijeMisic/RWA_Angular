@@ -11,14 +11,12 @@
   font-weight: 600;
 }
 
-/* GRID */
 .announcements-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 30px;
 }
 
-/* CARD */
 .announcement-card {
   background-color: white;
   border-radius: 12px;
@@ -38,7 +36,6 @@
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
-/* HEADER */
 .announcement-header {
   display: flex;
   justify-content: space-between;
@@ -58,7 +55,6 @@
   font-weight: 500;
 }
 
-/* TEXT */
 .message {
   font-size: 15px;
   color: #5a4635;
@@ -67,9 +63,8 @@
   flex-grow: 1;
 }
 
-/* DUGME KORISNIKA */
 .btn.read-more {
-  background-color: #a97451; /* tvoja standardna boja */
+  background-color: #a97451;
   color: white;
   border: none;
   border-radius: 6px;
@@ -83,7 +78,6 @@
   background-color: #8c5c3a;
 }
 
-/* DUGMAD ZA ADMINA */
 .card-buttons {
   display: flex;
   flex-direction: column;
@@ -91,7 +85,7 @@
 }
 
 .btn.edit-btn {
-  background-color: #f0ad4e; /* drugačija boja */
+  background-color: #f0ad4e;
   color: white;
   border: none;
   border-radius: 6px;
@@ -109,9 +103,8 @@
   background-color: #ec971f;
 }
 
-/* --- Admin Delete dugme --- */
 .btn.delete-btn {
-  background-color: #d9534f; /* crvena */
+  background-color: #d9534f;
   color: white;
   border: none;
   border-radius: 6px;
@@ -131,11 +124,11 @@
 
 .add-announcement-wrapper {
   margin-bottom: 25px;
-  text-align: right; /* da bude na desnoj strani */
+  text-align: right;
 }
 
 .btn.add-btn {
-  background-color: #5cb85c; /* zelena boja */
+  background-color: #5cb85c;
   color: white;
   border: none;
   border-radius: 6px;
@@ -151,7 +144,6 @@
   background-color: #4cae4c;
 }
 
-/* RESPONSIVE */
 @media (max-width: 1100px) {
   .announcements-grid {
     grid-template-columns: repeat(2, 1fr);

@@ -12,7 +12,7 @@ import { User } from '../../../core/models/user.model';
 import { AppState } from '../../../store/app.state';
 import { Store } from '@ngrx/store';
 import * as AnnouncementsActions from '../../../store/announcements/announcements.actions';
-import { firstValueFrom, take } from 'rxjs';
+import { take } from 'rxjs';
 import { Announcement } from '../../../core/models/announcement.model';
 import { selectCurrentUser } from '../../../store/users/users.selectors';
 import { Router } from '@angular/router';

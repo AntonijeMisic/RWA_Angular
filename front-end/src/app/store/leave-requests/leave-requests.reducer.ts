@@ -43,7 +43,6 @@ export const leaveRequestReducer = createReducer(
     loading: false,
   })),
 
-  // Load leave requests by user
   on(LeaveRequestActions.loadUserLeaveRequests, (state) => ({
     ...state,
     loading: true,
@@ -87,7 +86,6 @@ export const leaveRequestReducer = createReducer(
     })
   ),
 
-  // Load leave types
   on(LeaveRequestActions.loadLeaveTypes, (state) => ({
     ...state,
     loading: true,
@@ -103,7 +101,6 @@ export const leaveRequestReducer = createReducer(
     loading: false,
   })),
 
-  // Create leave request
   on(LeaveRequestActions.createLeaveRequest, (state) => ({
     ...state,
     loading: true,
@@ -123,7 +120,6 @@ export const leaveRequestReducer = createReducer(
     loading: false,
   })),
 
-  // Delete leave request
   on(LeaveRequestActions.deleteLeaveRequest, (state) => ({
     ...state,
     loading: true,
@@ -139,7 +135,6 @@ export const leaveRequestReducer = createReducer(
     loading: false,
   })),
 
-  // Update status
   on(
     LeaveRequestActions.updateLeaveRequestStatusSuccess,
     (state, { leaveRequest }) => ({

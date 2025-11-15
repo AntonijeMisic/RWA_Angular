@@ -1,6 +1,5 @@
 <div class="profile-wrapper">
 
-  <!-- Naslov -->
   <h2 *ngIf="!announcementNotFound() && !isLoading()">
     {{ route.snapshot.paramMap.get('id')
         ? (isAdmin() ? 'Edit Announcement' : announcementForm.get('title')?.value)
@@ -8,7 +7,6 @@
   </h2>
   <h2 *ngIf="announcementNotFound()">Announcement Not Found</h2>
 
-  <!-- ADMIN: forma za edit/create -->
   <form *ngIf="!announcementNotFound() && !isLoading() && isAdmin()"
         [formGroup]="announcementForm"
         (ngSubmit)="saveAnnouncement()"
@@ -34,7 +32,6 @@
     </div>
   </form>
 
-  <!-- USER: read-only prikaz, samo content bez labela -->
   <div *ngIf="!announcementNotFound() && !isLoading() && !isAdmin()" class="announcement-view">
     <div [innerHTML]="announcementForm.get('message')?.value"></div>
   </div>

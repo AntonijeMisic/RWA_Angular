@@ -1,7 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 import { Announcement } from '../../core/models/announcement.model';
 
-// Load
 export const loadAnnouncements = createAction('[Announcements] Load All');
 export const loadAnnouncementsSuccess = createAction(
   '[Announcements] Load All Success',
@@ -27,7 +26,6 @@ export const loadAnnouncementByIdFailure = createAction(
   props<{ error: any }>()
 );
 
-// Create
 export const createAnnouncement = createAction(
   '[Announcements] Create',
   props<{ announcement: Partial<Announcement> }>()
@@ -41,7 +39,6 @@ export const createAnnouncementFailure = createAction(
   props<{ error: any }>()
 );
 
-// Update
 export const updateAnnouncement = createAction(
   '[Announcements] Update',
   props<{ announcement: Partial<Announcement> }>()
@@ -55,7 +52,6 @@ export const updateAnnouncementFailure = createAction(
   props<{ error: any }>()
 );
 
-// Delete
 export const deleteAnnouncement = createAction(
   '[Announcements] Delete',
   props<{ id: number }>()

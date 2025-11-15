@@ -84,7 +84,6 @@ export class LeaveRequestEffects {
   );
 
   deleteLeaveRequest$ = createEffect(() =>
-    //ne znam da li ce da mi treba
     this.actions$.pipe(
       ofType(LeaveRequestActions.deleteLeaveRequest),
       exhaustMap((action) =>
