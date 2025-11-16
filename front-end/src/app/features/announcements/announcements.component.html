@@ -1,25 +1,31 @@
 <div class="announcements-container">
   <h2 class="page-title">Company Announcements</h2>
 
-  <div *ngIf="isAdmin()" class="add-announcement-wrapper">
-    <button class="btn add-btn" (click)="addAnnouncement()">
-      <i class="fas fa-plus"></i> Add Announcement
-    </button>
-  </div>
+  @if (isAdmin()) {
+    <div class="add-announcement-wrapper">
+      <button class="btn add-btn" (click)="addAnnouncement()">
+        <i class="fas fa-plus"></i> Add Announcement
+      </button>
+    </div>
+  }
 
   <div class="announcements-grid">
-    <div *ngFor="let ann of announcements$ | async" class="announcement-card">
-      <div class="announcement-header">
-        <h3>{{ ann.title }}</h3>
-      </div>
-      <p class="message">{{ ann.message }}</p>
+    @for (ann of (announcements$ | async); track ann.announcementId) {
+      <div class="announcement-card">
+        <div class="announcement-header">
+          <h3>{{ ann.title }}</h3>
+        </div>
+        <p class="message">{{ ann.message }}</p>
 
-      <div class="card-buttons">
-        <button class="btn read-more" (click)="showAnnouncement(ann)">Read more</button>
-        <button *ngIf="isAdmin()" class="btn delete-btn" (click)="deleteAnnouncement(ann)">
-          <i class="fas fa-trash"></i> Delete
-        </button>
+        <div class="card-buttons">
+          <button class="btn read-more" (click)="showAnnouncement(ann)">Read more</button>
+          @if (isAdmin()) {
+            <button class="btn delete-btn" (click)="deleteAnnouncement(ann)">
+              <i class="fas fa-trash"></i> Delete
+            </button>
+          }
+        </div>
       </div>
-    </div>
+    }
   </div>
 </div>

@@ -3,75 +3,75 @@
     <h2>User Management</h2>
 
     <form [formGroup]="filterForm" class="userlist-filters" (ngSubmit)="onFilter()">
-      <input
-        type="text"
-        placeholder="First Name"
-        class="filter-input"
-        formControlName="firstName"
-      />
-
-      <input
-        type="text"
-        placeholder="Last Name"
-        class="filter-input"
-        formControlName="lastName"
-      />
-
-      <input
-        type="text"
-        placeholder="Email"
-        class="filter-input"
-        formControlName="email"
-      />
+      <input type="text" placeholder="First Name" class="filter-input" formControlName="firstName" />
+      <input type="text" placeholder="Last Name" class="filter-input" formControlName="lastName" />
+      <input type="text" placeholder="Email" class="filter-input" formControlName="email" />
 
       <select class="filter-select" formControlName="userRoleId">
         <option [ngValue]="null">All Roles</option>
-        <option *ngFor="let role of userRoles" [ngValue]="role.userRoleId">
-          {{ role.roleName }}
-        </option>
+        @for (role of userRoles; track role.userRoleId) {
+          <option [ngValue]="role.userRoleId">{{ role.roleName }}</option>
+        }
       </select>
 
       <select class="filter-select" formControlName="userPositionId">
         <option [ngValue]="null">All Positions</option>
-        <option *ngFor="let pos of userPositions" [ngValue]="pos.userPositionId">{{ pos.userPositionName }}</option>
+        @for (pos of userPositions; track pos.userPositionId) {
+          <option [ngValue]="pos.userPositionId">{{ pos.userPositionName }}</option>
+        }
       </select>
 
       <button type="submit" class="btn add-btn">
         <i class="fas fa-search"></i> Search
       </button>
 
-      <button *ngIf="isAdmin()" type="button" class="btn add-btn" [routerLink]="['/home/profile']">
-        <i class="fas fa-plus"></i> Add User
-      </button>
+      @if (isAdmin()){
+        <button type="button" class="btn add-btn" [routerLink]="['/home/profile']">
+          <i class="fas fa-plus"></i> Add User
+        </button>
+      }
     </form>
   </header>
 
   <div class="userlist-table-wrap">
-    <div *ngIf="loading$ | async" class="spinner"></div>
-    <table *ngIf="!(loading$ | async)" class="userlist-table">
-      <thead>
-        <tr>
-          <th>First Name</th>
-          <th>Last Name</th>
-          <th>Email</th>
-          <th>Role</th>
-          <th>Position</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let user of users$ | async">
-          <td>{{ user.firstName }}</td>
-          <td>{{ user.lastName }}</td>
-          <td>{{ user.email }}</td>
-          <td>{{ user.userRole.roleName }}</td>
-          <td>{{ user.userPosition.userPositionName }}</td>
-          <td>
-            <button *ngIf="isAdmin()" class="btn small edit-btn" [routerLink]="['/home/profile', user.userId]"><i class="fas fa-edit"></i> Edit </button>
-            <button *ngIf="isAdmin()" class="btn small delete-btn" (click)="onDelete(user.userId!)"><i class="fas fa-trash"></i> Delete </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    @if (loading$ | async) {
+      <div class="spinner"></div>
+    }
+
+    @if (!(loading$ | async)){
+      <table class="userlist-table">
+        <thead>
+          <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Position</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of (users$ | async); track user.userId) {
+            <tr>
+              <td>{{ user.firstName }}</td>
+              <td>{{ user.lastName }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.userRole.roleName }}</td>
+              <td>{{ user.userPosition.userPositionName }}</td>
+              <td>
+                @if (isAdmin()){
+                  <button class="btn small edit-btn" [routerLink]="['/home/profile', user.userId]">
+                    <i class="fas fa-edit"></i> Edit
+                  </button>
+                  <button class="btn small delete-btn" (click)="onDelete(user.userId!)">
+                    <i class="fas fa-trash"></i> Delete
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
   </div>
 </div>

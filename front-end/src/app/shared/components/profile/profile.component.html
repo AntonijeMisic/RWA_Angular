@@ -1,31 +1,47 @@
 <div class="profile-wrapper">
-  <h2>{{ isNewUser ? 'Add New User' : 'Edit Profile' }}</h2>
+  <h2>
+    @if (isNewUser()) {
+      Add New User
+    } @else {
+      Edit Profile
+    }
+  </h2>
 
   <form [formGroup]="profileForm" (ngSubmit)="save()" class="profile-form">
 
     <div class="form-row">
       <label>First Name</label>
       <input type="text" formControlName="firstName">
-      <div class="error" *ngIf="profileForm.controls.firstName.invalid && profileForm.controls.firstName.touched">
-        First Name is required.
-      </div>
+      @if (profileForm.controls.firstName.invalid && profileForm.controls.firstName.touched) {
+        <div class="error">
+          First Name is required.
+        </div>
+      }
     </div>
 
     <div class="form-row">
       <label>Last Name</label>
       <input type="text" formControlName="lastName">
-      <div class="error" *ngIf="profileForm.controls.lastName.invalid && profileForm.controls.lastName.touched">
-        Last Name is required.
-      </div>
+      @if (profileForm.controls.lastName.invalid && profileForm.controls.lastName.touched) {
+        <div class="error">
+          Last Name is required.
+        </div>
+      }
     </div>
 
     <div class="form-row">
       <label>Email</label>
       <input type="email" formControlName="email">
-      <div class="error" *ngIf="profileForm.controls.email.invalid && profileForm.controls.email.touched">
-        <span *ngIf="profileForm.controls.email.errors?.['required']">Email is required.</span>
-        <span *ngIf="profileForm.controls.email.errors?.['email']">Invalid email address.</span>
-      </div>
+      @if (profileForm.controls.email.invalid && profileForm.controls.email.touched) {
+        <div class="error">
+          @if (profileForm.controls.email.errors?.['required']) {
+            Email is required.
+          }
+          @if (profileForm.controls.email.errors?.['email']) {
+            Invalid email address.
+          }
+        </div>
+      }
     </div>
 
     <div class="form-row">
@@ -33,42 +49,58 @@
       <input
         type="password"
         formControlName="password"
-        [placeholder]="isNewUser ? 'Enter password' : '••••••'"
+        [placeholder]="isNewUser() ? '' : '••••••'"
       >
-      <div class="error" *ngIf="profileForm.controls.password.invalid && profileForm.controls.password.touched">
-        <span *ngIf="profileForm.controls.password.errors?.['required']">Password is required.</span>
-        <span *ngIf="profileForm.controls.password.errors?.['minlength']">Password must be at least 6 characters.</span>
-      </div>
+      @if (profileForm.controls.password.invalid && profileForm.controls.password.touched) {
+        <div class="error">
+          @if (profileForm.controls.password.errors?.['required']) {
+            Password is required.
+          }
+          @if (profileForm.controls.password.errors?.['minlength']) {
+            Password must be at least 6 characters.
+          }
+        </div>
+      }
     </div>
 
     <div class="form-row">
       <label>Role</label>
       <select formControlName="userRoleId">
         <option value="" disabled>Select Role</option>
-        <option *ngFor="let role of userRoles" [ngValue]="role.userRoleId">{{ role.roleName }}</option>
+        @for (role of userRoles; track role.userRoleId) {
+          <option [ngValue]="role.userRoleId">{{ role.roleName }}</option>
+        }
       </select>
-      <div class="error" *ngIf="profileForm.controls.userRoleId.invalid && profileForm.controls.userRoleId.touched">
-        Role is required.
-      </div>
+      @if (profileForm.controls.userRoleId.invalid && profileForm.controls.userRoleId.touched) {
+        <div class="error">
+          Role is required.
+        </div>
+      }
     </div>
 
     <div class="form-row">
       <label>Position</label>
       <select formControlName="userPositionId">
         <option value="" disabled>Select Position</option>
-        <option *ngFor="let pos of userPositions" [ngValue]="pos.userPositionId">{{ pos.userPositionName }}</option>
+        @for (pos of userPositions; track pos.userPositionId) {
+          <option [ngValue]="pos.userPositionId">{{ pos.userPositionName }}</option>
+        }
       </select>
-      <div class="error" *ngIf="profileForm.controls.userPositionId.invalid && profileForm.controls.userPositionId.touched">
-        Position is required.
-      </div>
+      @if (profileForm.controls.userPositionId.invalid && profileForm.controls.userPositionId.touched) {
+        <div class="error">
+          Position is required.
+        </div>
+      }
     </div>
 
     <div class="form-row">
       <label>Start Date</label>
       <input type="date" formControlName="startDate">
-      <div class="error" *ngIf="profileForm.controls.startDate.invalid && profileForm.controls.startDate.touched">
-        Start Date is required.
-      </div>
+      @if (profileForm.controls.startDate.invalid && profileForm.controls.startDate.touched) {
+        <div class="error">
+          Start Date is required.
+        </div>
+      }
     </div>
 
     <div class="form-row">
@@ -77,7 +109,9 @@
     </div>
 
     <div class="form-actions">
-      <button type="submit" class="btn save-btn">{{ isNewUser ? 'Create' : 'Update' }}</button>
+      <button type="submit" class="btn save-btn">
+        @if (isNewUser()) { Create } @else { Update }
+      </button>
     </div>
   </form>
 </div>

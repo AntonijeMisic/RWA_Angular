@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { User } from '../../core/models/user.model';
 import { RouterModule } from '@angular/router';
 import { LookupsService } from '../../core/services/lookups/lookups.service';
@@ -8,7 +15,7 @@ import { Store, StoreModule } from '@ngrx/store';
 import * as UsersActions from '../../store/users/users.actions';
 import {
   selectAllUsers,
-  selectUserById,
+  selectCurrentUser,
   selectUsersLoading,
 } from '../../store/users/users.selectors';
 import { Observable } from 'rxjs';
@@ -26,7 +33,7 @@ type UserFilterForm = {
 
 @Component({
   selector: 'app-users-list.component',
-  imports: [CommonModule, RouterModule, StoreModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule],
   templateUrl: './users-list.component.html',
   styleUrl: './users-list.component.css',
 })
@@ -35,23 +42,18 @@ export class UsersListComponent implements OnInit {
   userService = inject(UserService);
   store = inject(Store<AppState>);
 
-  users$!: Observable<User[]>;
-  loading$!: Observable<boolean>;
+  users$: Observable<User[]> = this.store.select(selectAllUsers);
+  loading$: Observable<boolean> = this.store.select(selectUsersLoading);
 
   userRoles: UserRole[] = [];
   userPositions: UserPosition[] = [];
-  isAdmin = signal(false);
+
+  currentUser$ = this.store.selectSignal(selectCurrentUser);
+  isAdmin = computed(() => this.currentUser$()?.userRole?.roleName === 'Admin');
 
   filterForm!: FormGroup<UserFilterForm>;
 
   constructor() {
-    const userId = this.userService.getUserId();
-    if (!userId) return;
-
-    this.userService.getUserById(userId).subscribe((user) => {
-      this.isAdmin.set(user.userRole?.roleName === 'Admin');
-    });
-
     this.filterForm = new FormGroup<UserFilterForm>({
       firstName: new FormControl<string | null>(null),
       lastName: new FormControl<string | null>(null),
@@ -68,9 +70,8 @@ export class UsersListComponent implements OnInit {
       this.userRoles = lookups.userRoles;
       this.userPositions = lookups.userPositions;
     }
+
     this.store.dispatch(UsersActions.loadUsers({}));
-    this.users$ = this.store.select(selectAllUsers);
-    this.loading$ = this.store.select(selectUsersLoading);
   }
 
   onFilter() {
@@ -85,7 +86,6 @@ export class UsersListComponent implements OnInit {
     };
 
     this.store.dispatch(UsersActions.loadUsers({ filter: filterDto }));
-    this.users$ = this.store.select(selectAllUsers);
   }
 
   onDelete(userId: number) {

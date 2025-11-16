@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LeaveType } from '../../../core/models/lookups.model';
+import { LookupsService } from '../../../core/services/lookups/lookups.service';
 
 @Component({
   selector: 'app-leave-request-dialog',
@@ -17,13 +18,12 @@ export class LeaveRequestDialogComponent {
   }>();
   @Output() cancelSelection = new EventEmitter<void>();
 
+  lookupService: LookupsService = inject(LookupsService);
+
   selectedLeaveTypeId: number | null = null;
   note: string = '';
 
-  leaveTypes: LeaveType[] = [
-    { leaveTypeId: 1, leaveTypeName: 'Vacation' },
-    { leaveTypeId: 2, leaveTypeName: 'Sick' },
-  ];
+  leaveTypes: LeaveType[] = this.lookupService.getLookups().leaveTypes;
 
   confirm() {
     if (this.selectedLeaveTypeId != null) {

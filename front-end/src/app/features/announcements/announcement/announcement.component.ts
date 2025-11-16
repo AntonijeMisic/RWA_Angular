@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import {
-  FormBuilder,
+  FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
@@ -8,14 +8,18 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { User } from '../../../core/models/user.model';
 import { AppState } from '../../../store/app.state';
 import { Store } from '@ngrx/store';
 import * as AnnouncementsActions from '../../../store/announcements/announcements.actions';
-import { take } from 'rxjs';
+import { combineLatest, take } from 'rxjs';
 import { Announcement } from '../../../core/models/announcement.model';
 import { selectCurrentUser } from '../../../store/users/users.selectors';
 import { Router } from '@angular/router';
+
+export interface AnnouncementForm {
+  title: FormControl<string>;
+  message: FormControl<string>;
+}
 
 @Component({
   selector: 'app-announcement',
@@ -25,62 +29,61 @@ import { Router } from '@angular/router';
   standalone: true,
 })
 export class AnnouncementComponent implements OnInit {
-  announcementForm!: FormGroup;
-  users: User[] = [];
-  isLoading = signal(true);
-  announcementNotFound = signal(false);
 
-  private store = inject(Store<AppState>);
-  private router = inject(Router);
-  private fb = inject(FormBuilder);
+  announcementForm!: FormGroup<AnnouncementForm>;
+  store = inject(Store<AppState>);
+  router = inject(Router);
   route = inject(ActivatedRoute);
 
   isAdmin = signal(false);
+  isLoading = signal(true);
+  announcementNotFound = signal(false);
 
   ngOnInit(): void {
-    this.announcementForm = this.fb.group({
-      title: ['', [Validators.required, Validators.maxLength(200)]],
-      message: ['', Validators.required],
-    });
-
-    this.store.select(selectCurrentUser).subscribe((user) => {
-      this.isAdmin.set(!!user && user.userRole?.roleName === 'Admin');
-
-      if (!!user && user.userRole?.roleName !== 'Admin') {
-        this.announcementForm.disable();
-      } else {
-        this.announcementForm.enable();
-      }
+    this.announcementForm = new FormGroup<AnnouncementForm>({
+      title: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required, Validators.maxLength(200)],
+      }),
+      message: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
     });
 
     const id = Number(this.route.snapshot.paramMap.get('id'));
 
-    if (id) {
-      this.store
-        .select((state) => state.announcements.selectedAnnouncement)
-        .subscribe((selected) => {
-          if (selected && selected.announcementId === id) {
-            this.announcementForm.patchValue(selected);
-            this.isLoading.set(false);
-            this.announcementNotFound.set(false);
-          } else if (!selected || selected.announcementId !== id) {
-            this.store.dispatch(
-              AnnouncementsActions.loadAnnouncementById({ id })
-            );
-          }
-        });
+    combineLatest([
+      this.store.select(selectCurrentUser),
+      this.store.select((state) => state.announcements.selectedAnnouncement),
+      this.store.select((state) => state.announcements.error),
+    ]).subscribe(([user, selected, error]) => {
+      this.isAdmin.set(!!user && user.userRole?.roleName === 'Admin');
+      if (!this.isAdmin()) {
+        this.announcementForm.disable();
+      } else {
+        this.announcementForm.enable();
+      }
 
-      this.store
-        .select((state) => state.announcements.error)
-        .subscribe((failed) => {
-          if (failed) {
-            this.isLoading.set(false);
-            this.announcementNotFound.set(true);
-          }
-        });
-    } else {
-      this.isLoading.set(false);
-    }
+      if (id) {
+        if (selected && selected.announcementId === id) {
+          this.announcementForm.patchValue(selected);
+          this.isLoading.set(false);
+          this.announcementNotFound.set(false);
+        } else {
+          this.store.dispatch(
+            AnnouncementsActions.loadAnnouncementById({ id: id })
+          );
+        }
+
+        if (error) {
+          this.isLoading.set(false);
+          this.announcementNotFound.set(true);
+        }
+      } else {
+        this.isLoading.set(false);
+      }
+    });
   }
 
   saveAnnouncement() {

@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
-
 import { AppState } from '../../store/app.state';
 import { Announcement } from '../../core/models/announcement.model';
 import { selectAllAnnouncements } from '../../store/announcements/announcements.selectors';
@@ -25,6 +24,7 @@ export class AnnouncementsComponent implements OnInit {
   announcements$: Observable<Announcement[]> = this.store.select(
     selectAllAnnouncements
   );
+
   isAdmin = signal(false);
 
   ngOnInit(): void {

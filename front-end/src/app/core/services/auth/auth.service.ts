@@ -34,10 +34,6 @@ export class AuthService {
     return localStorage.getItem(environment.accessTokenKey);
   }
 
-  getRefreshToken(): string | null {
-    return localStorage.getItem(environment.refreshTokenKey);
-  }
-
   isLoggedIn(): boolean {
     return !!this.getAccessToken();
   }
@@ -45,22 +41,27 @@ export class AuthService {
   logout(): void {
     const refreshToken = localStorage.getItem('refresh_token');
 
-    if (refreshToken) {
-      this.http
-        .post(`${environment.apiUrl}/auth/logout`, { refreshToken })
-        .subscribe({
-          next: () => this.clearAuthData(),
-          error: () => this.clearAuthData(),
-        });
-    } else {
+    const navigateToLogin = () => {
       this.clearAuthData();
+      this.router.navigate(['/login']);
+    };
+
+    if (!refreshToken) {
+      navigateToLogin();
+      return;
     }
+
+    this.http
+      .post(`${environment.apiUrl}/auth/logout`, { refreshToken })
+      .subscribe({
+        next: () => navigateToLogin(),
+        error: () => navigateToLogin(),
+      });
   }
 
   private clearAuthData(): void {
     localStorage.removeItem(environment.userKey);
     localStorage.removeItem(environment.accessTokenKey);
     localStorage.removeItem(environment.refreshTokenKey);
-    this.router.navigate(['/login']);
   }
 }

@@ -1,28 +1,37 @@
 <div class="vacation-container">
   <div class="months-grid">
-    <div class="month-card" *ngFor="let month of months">
-      <div class="month-header">{{ month.name }} {{ currentYear }}</div>
+    @for (month of months; track month.name) {
+      <div class="month-card">
+        <div class="month-header">{{ month.name }} {{ currentYear }}</div>
 
-      <div class="week-days">
-        <div *ngFor="let day of weekDays" class="week-day">{{ day }}</div>
-      </div>
+        <div class="week-days">
+          @for (day of weekDays; track day) {
+            <div class="week-day">{{ day }}</div>
+          }
+        </div>
 
-      <div class="days-grid">
-        <div
-          *ngFor="let day of month.days"
-          [class.day-disabled]="day.isPast || day.date === 0 || day.requestStatus"
-          [class.day-selected]="day.selected && day.date !== 0"
-          [style.backgroundColor]="day.date !== 0 ? getDayColor(day) : 'transparent'"
-          [title]="day.date !== 0 ? (day.absenceType?.leaveTypeName + ' | ' + (day.requestStatus?.requestStatusName || '')) : ''"
-          (click)="day.date !== 0 && !day.requestStatus && selectDay(day)"
-        >
-          {{ day.date !== 0 ? day.date : '' }}
+        <div class="days-grid">
+          @for (day of month.days; track day) {
+            <div
+              [class.day-disabled]="day.isPast || day.date === 0 || day.requestStatus"
+              [class.day-selected]="day.selected && day.date !== 0"
+              [style.backgroundColor]="day.date !== 0 ? getDayColor(day) : 'transparent'"
+              [title]="day.date !== 0 ? (day.absenceType?.leaveTypeName + ' | ' + (day.requestStatus?.requestStatusName || '')) : ''"
+              (click)="day.date !== 0 && !day.requestStatus && selectDay(day)"
+            >
+              {{ day.date !== 0 ? day.date : '' }}
+            </div>
+          }
         </div>
       </div>
-    </div>
-    <app-leave-request-dialog
-      *ngIf="showLeaveDialog()"
-      (confirmSelection)="onLeaveDialogConfirm($event)"
-      (cancelSelection)="onLeaveDialogCancel()">
-    </app-leave-request-dialog>
+    }
+
+    @if (showLeaveDialog()){
+      <app-leave-request-dialog
+        (confirmSelection)="onLeaveDialogConfirm($event)"
+        (cancelSelection)="onLeaveDialogCancel()"
+      >
+      </app-leave-request-dialog>
+    }
+  </div>
 </div>

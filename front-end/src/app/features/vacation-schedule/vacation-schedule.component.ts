@@ -11,12 +11,11 @@ import {
   loadLeaveTypes,
   createLeaveRequest,
 } from '../../store/leave-requests/leave-requests.actions';
-import {
-  selectAllLeaveRequestsByUser,
-  selectLeaveTypes,
-} from '../../store/leave-requests/leave-requests.selectors';
+import { selectAllLeaveRequestsByUser } from '../../store/leave-requests/leave-requests.selectors';
 import { selectCurrentUser } from '../../store/users/users.selectors';
 import { LeaveRequestDialogComponent } from './leave-request-dialog/leave-request-dialog.component';
+import { RequestStatus as LeaveRequestStatus } from '../../core/enums/enums';
+import { LookupsService } from '../../core/services/lookups/lookups.service';
 
 interface Day {
   date: number;
@@ -44,11 +43,11 @@ interface Month {
   styleUrls: ['./vacation-schedule.component.css'],
 })
 export class VacationScheduleComponent implements OnInit {
+  store = inject(Store<AppState>);
+
   currentYear = new Date().getFullYear();
   weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   months: Month[] = [];
-
-  private store = inject(Store<AppState>);
 
   currentUserId = signal<number | null>(null);
   showLeaveDialog = signal(false);
@@ -56,7 +55,6 @@ export class VacationScheduleComponent implements OnInit {
   leaveRequests$: Observable<LeaveRequest[]> = this.store.select(
     selectAllLeaveRequestsByUser
   );
-  leaveTypes$: Observable<LeaveType[]> = this.store.select(selectLeaveTypes);
 
   private firstSelectedDay: Day | null = null;
 
@@ -77,10 +75,6 @@ export class VacationScheduleComponent implements OnInit {
       this.clearAllSelections(false);
       this.applyRequestsToCalendar(requests);
     });
-  }
-
-  private getUserId(): number | null {
-    return this.currentUserId();
   }
 
   private generateMonths() {
@@ -186,7 +180,7 @@ export class VacationScheduleComponent implements OnInit {
     this.store.dispatch(
       createLeaveRequest({
         dto: {
-          userId: this.getUserId()!,
+          userId: this.currentUserId()!,
           leaveTypeId: data.leaveTypeId,
           startDate: new Date(
             this.currentYear,
@@ -306,12 +300,12 @@ export class VacationScheduleComponent implements OnInit {
 
   getDayColor(day: Day) {
     if (!day.requestStatus) return '';
-    switch (day.requestStatus.requestStatusName) {
-      case 'Pending':
+    switch (day.requestStatus.requestStatusId) {
+      case LeaveRequestStatus.Pending:
         return 'orange';
-      case 'Approved':
+      case LeaveRequestStatus.Approved:
         return 'green';
-      case 'Rejected':
+      case LeaveRequestStatus.Rejected:
         return 'red';
       default:
         return '';

@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -7,18 +7,21 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+
 import { User } from '../../../core/models/user.model';
 import { UserRole, UserPosition } from '../../../core/models/lookups.model';
+
 import { LookupsService } from '../../../core/services/lookups/lookups.service';
-import { UserService } from '../../../core/services/user/user.service';
 import { AppState } from '../../../store/app.state';
 import { Store } from '@ngrx/store';
+
 import * as UsersActions from '../../../store/users/users.actions';
-import { filter, map, switchMap, tap, of, take } from 'rxjs';
 import {
   selectSelectedUser,
-  selectUserById,
+  selectCurrentUser,
 } from '../../../store/users/users.selectors';
+
+import { map, switchMap, filter, take, of } from 'rxjs';
 
 type UserForm = {
   firstName: FormControl<string | null>;
@@ -41,20 +44,18 @@ type UserForm = {
 export class ProfileComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private userService = inject(UserService);
-  private lookupService = inject(LookupsService);
   private store = inject(Store<AppState>);
-
-  user?: User;
-  userId?: number | null;
-  isNewUser = false;
+  private lookupService = inject(LookupsService);
 
   userRoles: UserRole[] = [];
   userPositions: UserPosition[] = [];
   profileForm: FormGroup<UserForm>;
 
+  currentUser$ = this.store.select(selectCurrentUser);
+
   isAdmin = signal(false);
-  private currentUser = signal<User | null>(null);
+  routeUserId = signal<number | null>(null);
+  isNewUser = computed(() => this.routeUserId() === null);
 
   constructor() {
     this.profileForm = new FormGroup<UserForm>({
@@ -69,35 +70,31 @@ export class ProfileComponent implements OnInit {
       startDate: new FormControl<Date | null>(null, Validators.required),
       endDate: new FormControl<Date | null>(null),
     });
-
-    const currentUserId = this.userService.getUserId();
-    if (currentUserId) {
-      this.userService.getUserById(currentUserId).subscribe((user) => {
-        console.log('Fetched current user:', user);
-        console.log(user.userRole?.roleName === 'Admin');
-        this.isAdmin.set(user.userRole?.roleName === 'Admin');
-        if (user.userRole?.roleName === 'Admin') {
-          this.profileForm.controls['userRoleId'].enable();
-        } else {
-          this.profileForm.controls['userRoleId'].disable();
-        }
-      });
-    }
   }
 
   ngOnInit(): void {
-    this.userRoles = this.lookupService.getLookups().userRoles;
-    this.userPositions = this.lookupService.getLookups().userPositions;
+    const lookups = this.lookupService.getLookups();
+    this.userRoles = lookups.userRoles;
+    this.userPositions = lookups.userPositions;
+
+    this.currentUser$.pipe(filter(Boolean)).subscribe((user) => {
+      this.isAdmin.set(user.userRole?.roleName === 'Admin');
+
+      if (this.isAdmin()) {
+        this.profileForm.controls['userRoleId'].enable();
+      } else {
+        this.profileForm.controls['userRoleId'].disable();
+      }
+    });
 
     this.route.paramMap
       .pipe(
         map((paramMap) => paramMap.get('id')),
         map((id) => (id ? Number(id) : null)),
         switchMap((userId) => {
-          this.userId = userId;
-          this.isNewUser = !userId;
+          this.routeUserId.set(userId);
 
-          if (this.isNewUser) {
+          if (this.isNewUser()) {
             this.profileForm.reset();
             this.profileForm.controls.password.setValidators(
               Validators.required
@@ -108,15 +105,15 @@ export class ProfileComponent implements OnInit {
 
           this.store.dispatch(UsersActions.loadUserById({ userId }));
 
-          return this.store.select(selectSelectedUser).pipe(
-            filter((user) => !!user && user.userId === userId)
-          );
+          return this.store
+            .select(selectSelectedUser)
+            .pipe(filter((user) => !!user && user.userId === userId));
         })
       )
       .subscribe((user) => {
         if (user) {
-          this.user = user;
           const { password, ...rest } = user;
+
           this.profileForm.patchValue({
             ...rest,
             password: null,
@@ -134,43 +131,41 @@ export class ProfileComponent implements OnInit {
       return;
     }
 
-    const userData = this.profileForm.getRawValue();
+    const formValue = this.profileForm.getRawValue();
 
     const payload: Partial<User> = {
-      userId: this.isNewUser ? null : this.userId!,
-      firstName: userData.firstName || '',
-      lastName: userData.lastName || '',
-      email: userData.email || '',
-      userRoleId: userData.userRoleId || 0,
+      userId: this.isNewUser() ? null : this.routeUserId(),
+      firstName: formValue.firstName || '',
+      lastName: formValue.lastName || '',
+      email: formValue.email || '',
+      userRoleId: formValue.userRoleId || 0,
       userRole: this.userRoles.find(
-        (ur) => ur.userRoleId === userData.userRoleId
+        (r) => r.userRoleId === formValue.userRoleId
       )!,
-      userPositionId: userData.userPositionId || 0,
+      userPositionId: formValue.userPositionId || 0,
       userPosition: this.userPositions.find(
-        (up) => up.userPositionId === userData.userPositionId
+        (p) => p.userPositionId === formValue.userPositionId
       )!,
-      startDate: userData.startDate || new Date(),
-      endDate: userData.endDate || null,
+      startDate: formValue.startDate || new Date(),
+      endDate: formValue.endDate || null,
     };
 
-    if (userData.password) {
-      payload.password = userData.password;
+    if (formValue.password) {
+      payload.password = formValue.password;
     }
 
-    if (this.isNewUser) {
+    if (this.isNewUser()) {
       this.store.dispatch(UsersActions.createUser({ user: payload as User }));
     } else {
       this.store.dispatch(UsersActions.updateUser({ user: payload as User }));
     }
 
     this.store
-      .select((state) => state.users.loading)
+      .select((s) => s.users.loading)
       .pipe(
-        filter((loading) => loading === false),
+        filter((l) => !l),
         take(1)
       )
-      .subscribe(() => {
-        this.router.navigate(['/home/users']);
-      });
+      .subscribe(() => this.router.navigate(['/home/users']));
   }
 }

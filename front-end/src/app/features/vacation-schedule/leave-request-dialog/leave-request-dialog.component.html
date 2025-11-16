@@ -6,9 +6,9 @@
       <label for="leaveType">Leave Type</label>
       <select id="leaveType" [(ngModel)]="selectedLeaveTypeId">
         <option value="" disabled>Select a leave type</option>
-        <option *ngFor="let type of leaveTypes" [ngValue]="type.leaveTypeId">
-          {{ type.leaveTypeName }}
-        </option>
+        @for (type of leaveTypes; track type.leaveTypeId) {
+          <option [ngValue]="type.leaveTypeId">{{ type.leaveTypeName }}</option>
+        }
       </select>
     </div>
 

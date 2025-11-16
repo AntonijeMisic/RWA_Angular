@@ -8,15 +8,9 @@ import {
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
 import { Store } from '@ngrx/store';
 import * as UsersActions from '../../store/users/users.actions';
 import { AppState } from '../../store/app.state';
-
-export interface Login {
-  email: string;
-  password: string;
-}
 
 export interface LoginForm {
   email: FormControl<string>;
@@ -26,35 +20,38 @@ export interface LoginForm {
 @Component({
   selector: 'app-login.component',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, HttpClientModule],
+  imports: [CommonModule, ReactiveFormsModule],
   providers: [AuthService],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
 export class LoginComponent {
-  loginForm = new FormGroup<LoginForm>({
-    email: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.email],
-    }),
-    password: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-  });
+  store: Store<AppState> = inject(Store<AppState>);
+  authService: AuthService = inject(AuthService);
+  router: Router = inject(Router);
 
+  loginForm: FormGroup<LoginForm>;
   errorMessage: string | null = null;
 
-  private store: Store<AppState> = inject(Store<AppState>);
-
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor() {
+    this.loginForm = new FormGroup<LoginForm>({
+      email: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required, Validators.email],
+      }),
+      password: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
+    });
+  }
 
   onSubmit() {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       return;
     }
-    const loginData: Login = this.loginForm.getRawValue();
+    const loginData = this.loginForm.getRawValue();
     this.authService.login(loginData.email, loginData.password).subscribe({
       next: (res) => {
         this.authService.saveAuthData(

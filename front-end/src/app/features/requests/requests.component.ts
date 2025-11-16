@@ -18,6 +18,7 @@ import {
   loadLeaveRequests,
   updateLeaveRequestStatus,
 } from '../../store/leave-requests/leave-requests.actions';
+import { RequestStatus as LeaveRequestStatus } from '../../core/enums/enums';
 
 @Component({
   selector: 'app-requests',
@@ -27,10 +28,8 @@ import {
   styleUrl: './requests.component.css',
 })
 export class RequestsComponent implements OnInit {
-  private store = inject(Store);
-  private lookupService = inject(LookupsService);
-
-  currentUserId = signal<number | null>(null);
+  store = inject(Store);
+  lookupService = inject(LookupsService);
 
   leaveRequests$: Observable<LeaveRequest[]> = this.store.select(
     selectAllLeaveRequests
@@ -39,6 +38,8 @@ export class RequestsComponent implements OnInit {
   requestStatuses: RequestStatus[] = [];
   searchText = '';
   filterStatus: number | null = null;
+
+  currentUserId = signal<number | null>(null);
 
   ngOnInit(): void {
     this.requestStatuses = this.lookupService.getLookups().requestStatuses;
@@ -52,15 +53,11 @@ export class RequestsComponent implements OnInit {
       });
   }
 
-  private getUserId(): number | null {
-    return this.currentUserId();
-  }
-
   approveRequest(req: LeaveRequest) {
     const dto: UpdateStatusDto = {
       requestId: req.requestId,
-      approverId: this.getUserId()!,
-      statusId: 2, // Approved
+      approverId: this.currentUserId()!,
+      statusId: LeaveRequestStatus.Approved,
     };
     this.store.dispatch(updateLeaveRequestStatus({ dto }));
   }
@@ -68,8 +65,8 @@ export class RequestsComponent implements OnInit {
   rejectRequest(req: LeaveRequest) {
     const dto: UpdateStatusDto = {
       requestId: req.requestId,
-      approverId: this.getUserId()!,
-      statusId: 3, // Rejected
+      approverId: this.currentUserId()!,
+      statusId: LeaveRequestStatus.Rejected,
     };
     this.store.dispatch(updateLeaveRequestStatus({ dto }));
   }

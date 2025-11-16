@@ -1,12 +1,11 @@
-import { Component, inject, signal, effect } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { Component, inject, computed } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
 
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { AppState } from '../../../store/app.state';
 import { selectCurrentUser } from '../../../store/users/users.selectors';
-import { User } from '../../../core/models/user.model';
 import * as AuthActions from '../../../store/auth/auth.actions';
 
 @Component({
@@ -17,23 +16,12 @@ import * as AuthActions from '../../../store/auth/auth.actions';
   styleUrls: ['./sidebar.component.css'],
 })
 export class SidebarComponent {
-  currentUser = signal<User | null>(null);
-  isAdmin = signal(false);
-
-  private authService = inject(AuthService);
   private store = inject(Store<AppState>);
+  private authService = inject(AuthService);
 
-  constructor() {
-    const currentUserSignal = this.store.selectSignal(selectCurrentUser);
+  currentUser = this.store.selectSignal(selectCurrentUser);
 
-    effect(() => {
-      const user = currentUserSignal();
-      if (user) {
-        this.currentUser.set(user);
-        this.isAdmin.set(!!user && user.userRole?.roleName === 'Admin');
-      }
-    });
-  }
+  isAdmin = computed(() => this.currentUser()?.userRole?.roleName === 'Admin');
 
   onLogout(): void {
     this.store.dispatch(AuthActions.logout());
