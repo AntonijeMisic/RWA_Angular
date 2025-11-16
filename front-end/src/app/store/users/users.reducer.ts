@@ -2,22 +2,25 @@ import { createReducer, on } from '@ngrx/store';
 import * as UsersActions from './users.actions';
 import * as AuthActions from '../auth/auth.actions';
 import { User } from '../../core/models/user.model';
+import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
 
-export interface UsersState {
-  users: User[];
+export interface UsersState extends EntityState<User> {
   loading: boolean;
   error: any;
-  selectedUser?: User | null;
-  currentUser?: User | null;
+  selectedUser: User | null;
+  currentUser: User | null;
 }
 
-export const initialState: UsersState = {
-  users: [],
+export const usersAdapter: EntityAdapter<User> = createEntityAdapter<User>({
+  selectId: (user) => user.userId!,
+});
+
+export const initialState: UsersState = usersAdapter.getInitialState({
   loading: false,
   error: null,
   selectedUser: null,
   currentUser: null,
-};
+});
 
 export const usersReducer = createReducer(
   initialState,
@@ -27,12 +30,16 @@ export const usersReducer = createReducer(
     loading: true,
     error: null,
   })),
-  on(UsersActions.setCurrentUserSuccess, (state, { user }) => ({
-    ...state,
-    currentUser: user,
-    users: state.users.map((u) => (u.userId === user.userId ? user : u)),
-    loading: false,
-  })),
+
+  on(UsersActions.setCurrentUserSuccess, (state, { user }) => {
+    const updated = usersAdapter.upsertOne(user, state);
+    return {
+      ...updated,
+      currentUser: user,
+      loading: false,
+    };
+  }),
+
   on(UsersActions.setCurrentUserFailure, (state, { error }) => ({
     ...state,
     loading: false,
@@ -44,27 +51,32 @@ export const usersReducer = createReducer(
     loading: true,
     error: null,
   })),
-  on(UsersActions.updateCurrentUserSuccess, (state, { user }) => ({
-    ...state,
-    currentUser: user,
-    users: state.users.map((u) => (u.userId === user.userId ? user : u)),
-    loading: false,
-  })),
+
+  on(UsersActions.updateCurrentUserSuccess, (state, { user }) => {
+    const updated = usersAdapter.upsertOne(user, state);
+    return {
+      ...updated,
+      currentUser: user,
+      loading: false,
+    };
+  }),
+
   on(UsersActions.updateCurrentUserFailure, (state, { error }) => ({
     ...state,
     loading: false,
     error,
   })),
+
   on(UsersActions.loadUsers, (state) => ({
     ...state,
     loading: true,
     error: null,
   })),
-  on(UsersActions.loadUsersSuccess, (state, { users }) => ({
-    ...state,
-    users,
-    loading: false,
-  })),
+
+  on(UsersActions.loadUsersSuccess, (state, { users }) =>
+    usersAdapter.setAll(users, { ...state, loading: false })
+  ),
+
   on(UsersActions.loadUsersFailure, (state, { error }) => ({
     ...state,
     loading: false,
@@ -76,11 +88,17 @@ export const usersReducer = createReducer(
     loading: true,
     error: null,
   })),
-  on(UsersActions.loadUserByIdSuccess, (state, { user }) => ({
-    ...state,
-    selectedUser: user,
-    loading: false,
-  })),
+
+  on(UsersActions.loadUserByIdSuccess, (state, { user }) => {
+    const updated = usersAdapter.upsertOne(user, state);
+
+    return {
+      ...updated,
+      selectedUser: user,
+      loading: false,
+    };
+  }),
+
   on(UsersActions.loadUserByIdFailure, (state, { error }) => ({
     ...state,
     loading: false,
@@ -92,11 +110,11 @@ export const usersReducer = createReducer(
     loading: true,
     error: null,
   })),
-  on(UsersActions.createUserSuccess, (state, { user }) => ({
-    ...state,
-    users: [...state.users, user],
-    loading: false,
-  })),
+
+  on(UsersActions.createUserSuccess, (state, { user }) =>
+    usersAdapter.addOne(user, { ...state, loading: false })
+  ),
+
   on(UsersActions.createUserFailure, (state, { error }) => ({
     ...state,
     loading: false,
@@ -108,28 +126,20 @@ export const usersReducer = createReducer(
     loading: true,
     error: null,
   })),
-  on(UsersActions.updateUserSuccess, (state, { user }) => {
-    const updatedUsers = state.users.map((u) =>
-      u.userId === user.userId ? user : u
-    );
 
-    const updatedSelectedUser =
-      state.selectedUser && state.selectedUser.userId === user.userId
-        ? user
-        : state.selectedUser;
-    const updatedCurrentUser =
-      state.currentUser && state.currentUser.userId === user.userId
-        ? user
-        : state.currentUser;
+  on(UsersActions.updateUserSuccess, (state, { user }) => {
+    const updatedState = usersAdapter.upsertOne(user, state);
 
     return {
-      ...state,
-      users: updatedUsers,
-      selectedUser: updatedSelectedUser,
-      currentUser: updatedCurrentUser,
+      ...updatedState,
+      selectedUser:
+        state.selectedUser?.userId === user.userId ? user : state.selectedUser,
+      currentUser:
+        state.currentUser?.userId === user.userId ? user : state.currentUser,
       loading: false,
     };
   }),
+
   on(UsersActions.updateUserFailure, (state, { error }) => ({
     ...state,
     loading: false,
@@ -141,17 +151,23 @@ export const usersReducer = createReducer(
     loading: true,
     error: null,
   })),
-  on(UsersActions.deleteUserSuccess, (state, { userId }) => ({
-    ...state,
-    users: state.users.filter((u) => u.userId !== userId),
-    selectedUser:
-      state.selectedUser?.userId === userId ? null : state.selectedUser,
-    loading: false,
-  })),
+
+  on(UsersActions.deleteUserSuccess, (state, { userId }) => {
+    const updatedState = usersAdapter.removeOne(userId, state);
+
+    return {
+      ...updatedState,
+      selectedUser:
+        state.selectedUser?.userId === userId ? null : state.selectedUser,
+      loading: false,
+    };
+  }),
+
   on(UsersActions.deleteUserFailure, (state, { error }) => ({
     ...state,
     loading: false,
     error,
   })),
+
   on(AuthActions.logout, () => initialState)
 );

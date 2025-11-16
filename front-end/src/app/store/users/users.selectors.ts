@@ -1,23 +1,28 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { UsersState } from './users.reducer';
+import { UsersState, usersAdapter } from './users.reducer';
+import { User } from '../../core/models/user.model';
 
 export const selectUsersState = createFeatureSelector<UsersState>('users');
 
 export const selectAllUsers = createSelector(
   selectUsersState,
-  (state) => state.users
+  (state: UsersState) =>
+    Object.values(state.entities)
+      .filter((user) => !!user)
+      .map((user) => <User>user)
 );
+
 export const selectUsersLoading = createSelector(
   selectUsersState,
   (state) => state.loading
 );
+
 export const selectCurrentUser = createSelector(
   selectUsersState,
   (state) => state.currentUser
 );
+
 export const selectSelectedUser = createSelector(
   selectUsersState,
   (state) => state.selectedUser
 );
-export const selectUserById = (id: number | null) =>
-  createSelector(selectAllUsers, (users) => users.find((u) => u.userId === id));

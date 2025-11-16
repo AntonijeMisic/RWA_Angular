@@ -1,12 +1,16 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { LeaveRequestState } from './leave-requests.reducer';
+import { LeaveRequest } from '../../core/models/leaveRequest.model';
 
 export const selectLeaveRequestState =
   createFeatureSelector<LeaveRequestState>('leaveRequests');
 
 export const selectAllLeaveRequests = createSelector(
   selectLeaveRequestState,
-  (state) => state.leaveRequests
+  (state: LeaveRequestState) =>
+    Object.values(state.entities)
+      .filter((request) => !!request)
+      .map((request) => <LeaveRequest>request)
 );
 
 export const selectAllLeaveRequestsByUser = createSelector(
@@ -17,11 +21,6 @@ export const selectAllLeaveRequestsByUser = createSelector(
 export const selectWeeklyApprovedLeavesForUser = createSelector(
   selectLeaveRequestState,
   (state) => state.weeklyApprovedLeavesForUser
-);
-
-export const selectLeaveTypes = createSelector(
-  selectLeaveRequestState,
-  (state) => state.leaveTypes
 );
 
 export const selectLeaveRequestsByStatus = (status: string) =>

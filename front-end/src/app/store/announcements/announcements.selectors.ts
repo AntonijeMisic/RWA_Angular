@@ -1,12 +1,16 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { AnnouncementsState } from './announcements.reducer';
+import { Announcement } from '../../core/models/announcement.model';
 
 export const selectAnnouncementsState =
   createFeatureSelector<AnnouncementsState>('announcements');
 
 export const selectAllAnnouncements = createSelector(
   selectAnnouncementsState,
-  (state) => state.announcements
+  (state: AnnouncementsState) =>
+    Object.values(state.entities)
+      .filter((ann) => !!ann)
+      .map((ann) => <Announcement>ann)
 );
 
 export const selectAnnouncementsLoading = createSelector(

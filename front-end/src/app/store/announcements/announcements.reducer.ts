@@ -1,21 +1,26 @@
-import { createReducer, on } from '@ngrx/store';
 import * as AnnouncementsActions from './announcements.actions';
 import * as AuthActions from '../auth/auth.actions';
 import { Announcement } from '../../core/models/announcement.model';
+import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
+import { createReducer, on } from '@ngrx/store';
 
-export interface AnnouncementsState {
-  announcements: Announcement[];
+export interface AnnouncementsState extends EntityState<Announcement> {
   selectedAnnouncement: Announcement | null;
   loading: boolean;
   error: any;
 }
 
-export const initialState: AnnouncementsState = {
-  announcements: [],
-  selectedAnnouncement: null,
-  loading: false,
-  error: null,
-};
+export const announcementsAdapter: EntityAdapter<Announcement> =
+  createEntityAdapter<Announcement>({
+    selectId: (announcement) => announcement.announcementId,
+  });
+
+export const initialState: AnnouncementsState =
+  announcementsAdapter.getInitialState({
+    selectedAnnouncement: null,
+    loading: false,
+    error: null,
+  });
 
 export const announcementsReducer = createReducer(
   initialState,
@@ -27,23 +32,20 @@ export const announcementsReducer = createReducer(
   })),
   on(
     AnnouncementsActions.loadAnnouncementsSuccess,
-    (state, { announcements }) => ({
-      ...state,
-      announcements,
-      loading: false,
-    })
+    (state, { announcements }) =>
+      announcementsAdapter.setAll(announcements, { ...state, loading: false })
   ),
   on(AnnouncementsActions.loadAnnouncementsFailure, (state, { error }) => ({
     ...state,
     loading: false,
     error,
   })),
+
   on(AnnouncementsActions.loadAnnouncementById, (state) => ({
     ...state,
     loading: true,
     error: null,
   })),
-
   on(
     AnnouncementsActions.loadAnnouncementByIdSuccess,
     (state, { announcement }) => ({
@@ -52,41 +54,44 @@ export const announcementsReducer = createReducer(
       selectedAnnouncement: announcement,
     })
   ),
-
   on(AnnouncementsActions.loadAnnouncementByIdFailure, (state, { error }) => ({
     ...state,
     loading: false,
     selectedAnnouncement: null,
     error,
   })),
+
   on(
     AnnouncementsActions.createAnnouncementSuccess,
-    (state, { announcement }) => ({
-      ...state,
-      announcements: [...state.announcements, announcement],
-    })
+    (state, { announcement }) =>
+      announcementsAdapter.addOne(announcement, state)
   ),
+
   on(
     AnnouncementsActions.updateAnnouncementSuccess,
-    (state, { announcement }) => ({
+    (state, { announcement }) =>
+      announcementsAdapter.updateOne(
+        { id: announcement.announcementId, changes: announcement },
+        {
+          ...state,
+          selectedAnnouncement:
+            state.selectedAnnouncement?.announcementId ===
+            announcement.announcementId
+              ? announcement
+              : state.selectedAnnouncement,
+        }
+      )
+  ),
+
+  on(AnnouncementsActions.deleteAnnouncementSuccess, (state, { id }) =>
+    announcementsAdapter.removeOne(id, {
       ...state,
-      announcements: state.announcements.map((a) =>
-        a.announcementId === announcement.announcementId ? announcement : a
-      ),
       selectedAnnouncement:
-        state.selectedAnnouncement?.announcementId ===
-        announcement.announcementId
-          ? announcement
+        state.selectedAnnouncement?.announcementId === id
+          ? null
           : state.selectedAnnouncement,
     })
   ),
-  on(AnnouncementsActions.deleteAnnouncementSuccess, (state, { id }) => ({
-    ...state,
-    announcements: state.announcements.filter((a) => a.announcementId !== id),
-    selectedAnnouncement:
-      state.selectedAnnouncement?.announcementId === id
-        ? null
-        : state.selectedAnnouncement,
-  })),
+
   on(AuthActions.logout, () => initialState)
 );

@@ -7,7 +7,11 @@ import {
 } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { LookupsService } from './core/services/lookups/lookups.service';
-import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
+import {
+  provideHttpClient,
+  withFetch,
+  withInterceptors,
+} from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideEffects } from '@ngrx/effects';
@@ -26,6 +30,9 @@ import { environment } from '../environments/environment';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideBrowserGlobalErrorListeners(),
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
     provideAppInitializer(async () => {
       const lookupsService = inject(LookupsService);
       const appService = inject(AppInitService);
@@ -51,9 +58,6 @@ export const appConfig: ApplicationConfig = {
         },
       ])
     ),
-    provideBrowserGlobalErrorListeners(),
-    provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
     provideStore({
       users: usersReducer,
       announcements: announcementsReducer,

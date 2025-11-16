@@ -1,26 +1,28 @@
-import { createReducer, on } from '@ngrx/store';
-import { LeaveRequest } from '../../core/models/leaveRequest.model';
-import { LeaveType } from '../../core/models/lookups.model';
 import * as LeaveRequestActions from './leave-requests.actions';
 import * as AuthActions from '../auth/auth.actions';
+import { LeaveRequest } from '../../core/models/leaveRequest.model';
+import { EntityAdapter, createEntityAdapter, EntityState } from '@ngrx/entity';
+import { createReducer, on } from '@ngrx/store';
 
-export interface LeaveRequestState {
-  leaveRequests: LeaveRequest[];
+export interface LeaveRequestState extends EntityState<LeaveRequest> {
   leaveRequestsByUser: LeaveRequest[];
   weeklyApprovedLeavesForUser: LeaveRequest[];
-  leaveTypes: LeaveType[];
   loading: boolean;
   error?: any;
 }
 
-export const initialLeaveRequestState: LeaveRequestState = {
-  leaveRequests: [],
-  leaveRequestsByUser: [],
-  weeklyApprovedLeavesForUser: [],
-  leaveTypes: [],
-  loading: false,
-  error: null,
-};
+export const leaveRequestsAdapter: EntityAdapter<LeaveRequest> =
+  createEntityAdapter<LeaveRequest>({
+    selectId: (leave) => leave.requestId
+  });
+
+export const initialLeaveRequestState: LeaveRequestState =
+  leaveRequestsAdapter.getInitialState({
+    leaveRequestsByUser: [],
+    weeklyApprovedLeavesForUser: [],
+    loading: false,
+    error: null,
+  });
 
 export const leaveRequestReducer = createReducer(
   initialLeaveRequestState,
@@ -28,24 +30,21 @@ export const leaveRequestReducer = createReducer(
   on(LeaveRequestActions.loadLeaveRequests, (state) => ({
     ...state,
     loading: true,
+    error: null,
   })),
-  on(
-    LeaveRequestActions.loadLeaveRequestsSuccess,
-    (state, { leaveRequests }) => ({
-      ...state,
-      leaveRequests,
-      loading: false,
-    })
+  on(LeaveRequestActions.loadLeaveRequestsSuccess, (state, { leaveRequests }) =>
+    leaveRequestsAdapter.setAll(leaveRequests, { ...state, loading: false })
   ),
   on(LeaveRequestActions.loadLeaveRequestsFailure, (state, { error }) => ({
     ...state,
-    error,
     loading: false,
+    error,
   })),
 
   on(LeaveRequestActions.loadUserLeaveRequests, (state) => ({
     ...state,
     loading: true,
+    error: null,
   })),
   on(
     LeaveRequestActions.loadUserLeaveRequestsSuccess,
@@ -57,8 +56,8 @@ export const leaveRequestReducer = createReducer(
   ),
   on(LeaveRequestActions.loadUserLeaveRequestsFailure, (state, { error }) => ({
     ...state,
-    error,
     loading: false,
+    error,
   })),
 
   on(LeaveRequestActions.loadApprovedLeavesForWeek, (state) => ({
@@ -66,17 +65,15 @@ export const leaveRequestReducer = createReducer(
     loading: true,
     error: null,
   })),
-
   on(
     LeaveRequestActions.loadApprovedLeavesForWeekSuccess,
     (state, { leaves }) => ({
       ...state,
-      loading: false,
       weeklyApprovedLeavesForUser: leaves,
+      loading: false,
       error: null,
     })
   ),
-
   on(
     LeaveRequestActions.loadApprovedLeavesForWeekFailure,
     (state, { error }) => ({
@@ -86,21 +83,6 @@ export const leaveRequestReducer = createReducer(
     })
   ),
 
-  on(LeaveRequestActions.loadLeaveTypes, (state) => ({
-    ...state,
-    loading: true,
-  })),
-  on(LeaveRequestActions.loadLeaveTypesSuccess, (state, { leaveTypes }) => ({
-    ...state,
-    leaveTypes,
-    loading: false,
-  })),
-  on(LeaveRequestActions.loadLeaveTypesFailure, (state, { error }) => ({
-    ...state,
-    error,
-    loading: false,
-  })),
-
   on(LeaveRequestActions.createLeaveRequest, (state) => ({
     ...state,
     loading: true,
@@ -108,16 +90,15 @@ export const leaveRequestReducer = createReducer(
   on(
     LeaveRequestActions.createLeaveRequestSuccess,
     (state, { leaveRequest }) => ({
-      ...state,
-      leaveRequests: [...state.leaveRequests, leaveRequest],
+      ...leaveRequestsAdapter.addOne(leaveRequest, state),
       leaveRequestsByUser: [...state.leaveRequestsByUser, leaveRequest],
       loading: false,
     })
   ),
   on(LeaveRequestActions.createLeaveRequestFailure, (state, { error }) => ({
     ...state,
-    error,
     loading: false,
+    error,
   })),
 
   on(LeaveRequestActions.deleteLeaveRequest, (state) => ({
@@ -125,27 +106,30 @@ export const leaveRequestReducer = createReducer(
     loading: true,
   })),
   on(LeaveRequestActions.deleteLeaveRequestSuccess, (state, { requestId }) => ({
-    ...state,
-    leaveRequests: state.leaveRequests.filter((r) => r.requestId !== requestId),
+    ...leaveRequestsAdapter.removeOne(requestId, state),
+    leaveRequestsByUser: state.leaveRequestsByUser.filter(
+      (r) => r.requestId !== requestId
+    ),
     loading: false,
   })),
   on(LeaveRequestActions.deleteLeaveRequestFailure, (state, { error }) => ({
     ...state,
-    error,
     loading: false,
+    error,
   })),
 
   on(
     LeaveRequestActions.updateLeaveRequestStatusSuccess,
     (state, { leaveRequest }) => ({
-      ...state,
-      leaveRequests: state.leaveRequests.map((r) =>
-        r.requestId === leaveRequest.requestId ? leaveRequest : r
+      ...leaveRequestsAdapter.updateOne(
+        { id: leaveRequest.requestId, changes: leaveRequest },
+        state
       ),
       leaveRequestsByUser: state.leaveRequestsByUser.map((r) =>
         r.requestId === leaveRequest.requestId ? leaveRequest : r
       ),
     })
   ),
+
   on(AuthActions.logout, () => initialLeaveRequestState)
 );

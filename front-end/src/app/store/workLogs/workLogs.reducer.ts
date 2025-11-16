@@ -1,21 +1,26 @@
-import { createReducer, on } from '@ngrx/store';
-import { WorkLog } from '../../core/models/workLog.model';
 import * as WorkLogsActions from './workLogs.actions';
 import * as AuthActions from '../auth/auth.actions';
+import { WorkLog } from '../../core/models/workLog.model';
+import { EntityAdapter, createEntityAdapter, EntityState } from '@ngrx/entity';
+import { createReducer, on } from '@ngrx/store';
 
-export interface WorkLogsState {
-  allLogs: WorkLog[];
+export interface WorkLogsState extends EntityState<WorkLog> {
   currentLog: WorkLog | null;
   loading: boolean;
   error: any;
 }
 
-export const initialWorkLogsState: WorkLogsState = {
-  allLogs: [],
-  currentLog: null,
-  loading: false,
-  error: null,
-};
+export const workLogsAdapter: EntityAdapter<WorkLog> =
+  createEntityAdapter<WorkLog>({
+    selectId: (log) => log.worklogId,
+  });
+
+export const initialWorkLogsState: WorkLogsState =
+  workLogsAdapter.getInitialState({
+    currentLog: null,
+    loading: false,
+    error: null,
+  });
 
 export const workLogsReducer = createReducer(
   initialWorkLogsState,
@@ -25,12 +30,9 @@ export const workLogsReducer = createReducer(
     loading: true,
     error: null,
   })),
-  on(WorkLogsActions.loadCurrentWeekLogsSuccess, (state, { logs }) => ({
-    ...state,
-    allLogs: logs,
-    loading: false,
-    error: null,
-  })),
+  on(WorkLogsActions.loadCurrentWeekLogsSuccess, (state, { logs }) =>
+    workLogsAdapter.setAll(logs, { ...state, loading: false, error: null })
+  ),
   on(WorkLogsActions.loadCurrentWeekLogsFailure, (state, { error }) => ({
     ...state,
     loading: false,
@@ -54,35 +56,24 @@ export const workLogsReducer = createReducer(
   })),
 
   on(WorkLogsActions.clockInSuccess, (state, { log }) => ({
-    ...state,
+    ...workLogsAdapter.upsertOne(log, state),
     currentLog: log,
-    allLogs: state.allLogs.some((l) => l.worklogId === log.worklogId)
-      ? state.allLogs.map((l) => (l.worklogId === log.worklogId ? log : l))
-      : [...state.allLogs, log],
   })),
 
   on(WorkLogsActions.clockOutSuccess, (state, { log }) => ({
-    ...state,
+    ...workLogsAdapter.updateOne({ id: log.worklogId, changes: log }, state),
     currentLog: log,
-    allLogs: state.allLogs.map((l) =>
-      l.worklogId === log.worklogId ? log : l
-    ),
   })),
 
   on(WorkLogsActions.takeBreakSuccess, (state, { log }) => ({
-    ...state,
+    ...workLogsAdapter.updateOne({ id: log.worklogId, changes: log }, state),
     currentLog: log,
-    allLogs: state.allLogs.map((l) =>
-      l.worklogId === log.worklogId ? log : l
-    ),
   })),
 
   on(WorkLogsActions.resumeWorkSuccess, (state, { log }) => ({
-    ...state,
+    ...workLogsAdapter.updateOne({ id: log.worklogId, changes: log }, state),
     currentLog: log,
-    allLogs: state.allLogs.map((l) =>
-      l.worklogId === log.worklogId ? log : l
-    ),
   })),
+
   on(AuthActions.logout, () => initialWorkLogsState)
 );
