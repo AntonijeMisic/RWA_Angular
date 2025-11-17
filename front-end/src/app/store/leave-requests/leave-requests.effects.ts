@@ -1,20 +1,19 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import * as LeaveRequestActions from './leave-requests.actions';
-import { catchError, exhaustMap, map, mergeMap } from 'rxjs/operators';
+import { catchError, map, mergeMap, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { LeaveRequestService } from '../../core/services/leave-request/leave-request.service';
 
 @Injectable()
 export class LeaveRequestEffects {
   private actions$ = inject(Actions);
-  private leaveRequestService: LeaveRequestService =
-    inject(LeaveRequestService);
+  private leaveRequestService = inject(LeaveRequestService);
 
   loadLeaveRequests$ = createEffect(() =>
     this.actions$.pipe(
       ofType(LeaveRequestActions.loadLeaveRequests),
-      exhaustMap(() =>
+      switchMap(() =>
         this.leaveRequestService.getRequests().pipe(
           map((leaveRequests) =>
             LeaveRequestActions.loadLeaveRequestsSuccess({ leaveRequests })
@@ -30,7 +29,7 @@ export class LeaveRequestEffects {
   loadUserLeaveRequests$ = createEffect(() =>
     this.actions$.pipe(
       ofType(LeaveRequestActions.loadUserLeaveRequests),
-      exhaustMap((action) =>
+      switchMap((action) =>
         this.leaveRequestService.getRequestsByUser(action.userId).pipe(
           map((leaveRequestsByUser) =>
             LeaveRequestActions.loadUserLeaveRequestsSuccess({
@@ -48,7 +47,7 @@ export class LeaveRequestEffects {
   loadApprovedLeavesForWeek$ = createEffect(() =>
     this.actions$.pipe(
       ofType(LeaveRequestActions.loadApprovedLeavesForWeek),
-      exhaustMap(({ userId, start, end }) =>
+      switchMap(({ userId, start, end }) =>
         this.leaveRequestService
           .getApprovedLeavesForWeek(userId, start, end)
           .pipe(
@@ -70,7 +69,7 @@ export class LeaveRequestEffects {
   createLeaveRequest$ = createEffect(() =>
     this.actions$.pipe(
       ofType(LeaveRequestActions.createLeaveRequest),
-      exhaustMap((action) =>
+      mergeMap((action) =>
         this.leaveRequestService.createLeaveRequest(action.dto).pipe(
           map((leaveRequest) =>
             LeaveRequestActions.createLeaveRequestSuccess({ leaveRequest })
@@ -86,7 +85,7 @@ export class LeaveRequestEffects {
   updateLeaveRequestStatus$ = createEffect(() =>
     this.actions$.pipe(
       ofType(LeaveRequestActions.updateLeaveRequestStatus),
-      exhaustMap((action) =>
+      mergeMap((action) =>
         this.leaveRequestService.updateStatus(action.dto).pipe(
           map((leaveRequest) =>
             LeaveRequestActions.updateLeaveRequestStatusSuccess({

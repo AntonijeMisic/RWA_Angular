@@ -2,8 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import * as UsersActions from './users.actions';
 import { UserService } from '../../core/services/user/user.service';
-import { catchError, exhaustMap, filter, map, of } from 'rxjs';
-import { User } from '../../core/models/user.model';
+import { catchError, filter, map, mergeMap, switchMap, of } from 'rxjs';
 
 @Injectable()
 export class UsersEffects {
@@ -13,7 +12,7 @@ export class UsersEffects {
   setCurrentUser$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UsersActions.setCurrentUser),
-      exhaustMap(({ userId }) =>
+      switchMap(({ userId }) =>
         this.userService.getUserById(userId).pipe(
           map((user) => UsersActions.setCurrentUserSuccess({ user })),
           catchError((error) =>
@@ -27,7 +26,7 @@ export class UsersEffects {
   loadUsers$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UsersActions.loadUsers),
-      exhaustMap((action) =>
+      switchMap((action) =>
         this.userService.getAllUsers(action.filter ?? {}).pipe(
           map((users) => UsersActions.loadUsersSuccess({ users })),
           catchError((error) => of(UsersActions.loadUsersFailure({ error })))
@@ -40,7 +39,7 @@ export class UsersEffects {
     this.actions$.pipe(
       ofType(UsersActions.loadUserById),
       filter((action) => action.userId != null),
-      exhaustMap(({ userId }) =>
+      switchMap(({ userId }) =>
         this.userService.getUserById(userId!).pipe(
           map((user) => UsersActions.loadUserByIdSuccess({ user })),
           catchError((error) => of(UsersActions.loadUserByIdFailure({ error })))
@@ -52,7 +51,7 @@ export class UsersEffects {
   createUser$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UsersActions.createUser),
-      exhaustMap(({ user }) =>
+      mergeMap(({ user }) =>
         this.userService.register(user).pipe(
           map((savedUser) =>
             UsersActions.createUserSuccess({ user: savedUser })
@@ -66,7 +65,7 @@ export class UsersEffects {
   updateUser$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UsersActions.updateUser),
-      exhaustMap(({ user }) =>
+      mergeMap(({ user }) =>
         this.userService.update(user).pipe(
           map((savedUser) =>
             UsersActions.updateUserSuccess({ user: savedUser })
@@ -76,10 +75,11 @@ export class UsersEffects {
       )
     )
   );
+
   deleteUser$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UsersActions.deleteUser),
-      exhaustMap(({ userId }) =>
+      mergeMap(({ userId }) =>
         this.userService.deleteUser(userId).pipe(
           map(() => UsersActions.deleteUserSuccess({ userId })),
           catchError((error) => of(UsersActions.deleteUserFailure({ error })))
