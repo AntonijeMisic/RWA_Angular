@@ -3,10 +3,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
   LeaveRequest,
-  CreateLeaveRequest,
-  UpdateStatusDto,
 } from '../../models/leaveRequest.model';
 import { environment } from '../../../../environments/environment';
+import { CreateLeaveRequestDto, UpdateStatusDto } from '../../dtos/dtos';
 
 @Injectable({
   providedIn: 'root',
@@ -36,7 +35,7 @@ export class LeaveRequestService {
     );
   }
 
-  createLeaveRequest(dto: CreateLeaveRequest): Observable<LeaveRequest> {
+  createLeaveRequest(dto: CreateLeaveRequestDto): Observable<LeaveRequest> {
     return this.http.post<LeaveRequest>(
       `${environment.apiUrl}/leave-requests`,
       dto

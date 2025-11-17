@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LeaveType } from '../../../core/models/lookups.model';
@@ -12,6 +12,8 @@ import { LookupsService } from '../../../core/services/lookups/lookups.service';
   imports: [CommonModule, FormsModule],
 })
 export class LeaveRequestDialogComponent {
+  @Input() errorMessage: string | null = null;
+
   @Output() confirmSelection = new EventEmitter<{
     leaveTypeId: number;
     note?: string;
@@ -27,6 +29,7 @@ export class LeaveRequestDialogComponent {
 
   confirm() {
     if (this.selectedLeaveTypeId != null) {
+      if (this.errorMessage) this.errorMessage = null;
       this.confirmSelection.emit({
         leaveTypeId: this.selectedLeaveTypeId,
         note: this.note ? this.note : undefined,

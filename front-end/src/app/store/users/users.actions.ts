@@ -1,6 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 import { User } from '../../core/models/user.model';
-import { UserFilterDto } from '../../core/dtos/userFilter.dto.';
+import { UserFilterDto } from '../../core/dtos/dtos';
 
 export const setCurrentUser = createAction(
   '[Users] Set Current User',

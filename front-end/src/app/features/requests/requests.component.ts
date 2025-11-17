@@ -6,7 +6,6 @@ import { combineLatest, map, Observable } from 'rxjs';
 
 import {
   LeaveRequest,
-  UpdateStatusDto,
 } from '../../core/models/leaveRequest.model';
 import { RequestStatus } from '../../core/models/lookups.model';
 import { LookupsService } from '../../core/services/lookups/lookups.service';
@@ -19,6 +18,7 @@ import {
   updateLeaveRequestStatus,
 } from '../../store/leave-requests/leave-requests.actions';
 import { RequestStatus as LeaveRequestStatus } from '../../core/enums/enums';
+import { UpdateStatusDto } from '../../core/dtos/dtos';
 
 @Component({
   selector: 'app-requests',

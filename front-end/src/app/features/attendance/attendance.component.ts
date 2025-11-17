@@ -25,16 +25,14 @@ import { selectWeeklyApprovedLeavesForUser } from '../../store/leave-requests/le
 })
 export class AttendanceComponent implements OnInit {
   private store = inject(Store<AppState>);
-  allLogs = signal<WorkLog[]>([]);
-  currentUserId = signal<number | null>(null);
 
   showWorkTypeDialog = false;
   selectedDay: Date | null = null;
 
   isOnBreak = signal(false);
-  breakMinutes = signal(0);
   approvedLeaves = signal<LeaveRequest[]>([]);
-  breakInterval: any = null;
+  allLogs = signal<WorkLog[]>([]);
+  currentUserId = signal<number | null>(null);
 
   weeklyLogs = computed(() => {
     const today = new Date();
@@ -130,20 +128,16 @@ export class AttendanceComponent implements OnInit {
     });
   }
 
-  private getUserId(): number | null {
-    return this.currentUserId();
-  }
-
   clockIn(day: Date) {
     if (this.isWeekend(day)) return;
-    const userId = this.getUserId();
+    const userId = this.currentUserId();
     if (!userId) return;
     this.store.dispatch(WorkLogsActions.clockIn({ userId }));
   }
 
   clockOut(day: Date) {
     if (this.isWeekend(day)) return;
-    const userId = this.getUserId();
+    const userId = this.currentUserId();
     if (!userId) return;
     this.store.dispatch(WorkLogsActions.clockOut({ userId }));
   }
@@ -151,7 +145,7 @@ export class AttendanceComponent implements OnInit {
   takeBreak(day: Date) {
     if (this.isWeekend(day)) return;
 
-    const userId = this.getUserId();
+    const userId = this.currentUserId();
     if (!userId) return;
 
     if (!this.isOnBreak()) {
@@ -202,7 +196,7 @@ export class AttendanceComponent implements OnInit {
   onWorkTypeSelected(workTypeId: number) {
     this.showWorkTypeDialog = false;
 
-    const userId = this.getUserId();
+    const userId = this.currentUserId();
     if (!userId || !this.selectedDay) return;
 
     this.store.dispatch(

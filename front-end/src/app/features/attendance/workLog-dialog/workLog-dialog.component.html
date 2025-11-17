@@ -6,7 +6,9 @@
       <label for="workType">Work Type</label>
       <select id="workType" [(ngModel)]="selectedWorkTypeId">
         <option value="" disabled>Select a work type</option>
-        <option *ngFor="let type of workTypes" [value]="type.workTypeId">{{ type.workTypeName }}</option>
+        @for(type of workTypes; track type.workTypeId){
+          <option [value]="type.workTypeId">{{ type.workTypeName }}</option>
+        }
       </select>
     </div>
 

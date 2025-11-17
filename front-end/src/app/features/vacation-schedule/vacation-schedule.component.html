@@ -16,7 +16,6 @@
               [class.day-disabled]="day.isPast || day.date === 0 || day.requestStatus"
               [class.day-selected]="day.selected && day.date !== 0"
               [style.backgroundColor]="day.date !== 0 ? getDayColor(day) : 'transparent'"
-              [title]="day.date !== 0 ? (day.absenceType?.leaveTypeName + ' | ' + (day.requestStatus?.requestStatusName || '')) : ''"
               (click)="day.date !== 0 && !day.requestStatus && selectDay(day)"
             >
               {{ day.date !== 0 ? day.date : '' }}
@@ -30,6 +29,7 @@
       <app-leave-request-dialog
         (confirmSelection)="onLeaveDialogConfirm($event)"
         (cancelSelection)="onLeaveDialogCancel()"
+        [errorMessage]="dialogError()"
       >
       </app-leave-request-dialog>
     }

@@ -16,6 +16,9 @@
       <label for="note">Note (optional)</label>
       <textarea id="note" rows="3" [(ngModel)]="note"></textarea>
     </div>
+    @if (errorMessage) {
+      <div class="error-message">{{ errorMessage }}</div>
+    }
 
     <div class="dialog-actions">
       <button class="btn cancel" (click)="cancel()">Cancel</button>

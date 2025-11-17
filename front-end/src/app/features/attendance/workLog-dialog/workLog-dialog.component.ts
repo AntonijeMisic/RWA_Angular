@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { WorkType } from '../../../core/models/lookups.model';
+import { LookupsService } from '../../../core/services/lookups/lookups.service';
 
 @Component({
   selector: 'app-work-log-dialog',
@@ -14,12 +15,11 @@ export class WorkLogDialogComponent {
   @Output() confirmSelection = new EventEmitter<number>();
   @Output() cancelSelection = new EventEmitter<void>();
 
+  lookupService: LookupsService = inject(LookupsService);
+
   selectedWorkTypeId: number | null = null;
 
-  workTypes: WorkType[] = [
-    { workTypeId: 1, workTypeName: 'Office' },
-    { workTypeId: 2, workTypeName: 'Remote' },
-  ];
+  workTypes: WorkType[] = this.lookupService.getLookups().workTypes;
 
   confirm() {
     if (this.selectedWorkTypeId != null) {

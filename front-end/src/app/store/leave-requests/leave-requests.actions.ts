@@ -1,10 +1,9 @@
 import { createAction, props } from '@ngrx/store';
 import {
   LeaveRequest,
-  CreateLeaveRequest,
-  UpdateStatusDto,
 } from '../../core/models/leaveRequest.model';
 import { LeaveType } from '../../core/models/lookups.model';
+import { CreateLeaveRequestDto, UpdateStatusDto } from '../../core/dtos/dtos';
 
 export const loadLeaveRequests = createAction(
   '[LeaveRequest] Load Leave Requests'
@@ -64,7 +63,7 @@ export const loadLeaveTypesFailure = createAction(
 
 export const createLeaveRequest = createAction(
   '[LeaveRequest] Create Leave Request',
-  props<{ dto: CreateLeaveRequest }>()
+  props<{ dto: CreateLeaveRequestDto }>()
 );
 
 export const createLeaveRequestSuccess = createAction(

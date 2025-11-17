@@ -15,14 +15,13 @@ import { selectAllLeaveRequestsByUser } from '../../store/leave-requests/leave-r
 import { selectCurrentUser } from '../../store/users/users.selectors';
 import { LeaveRequestDialogComponent } from './leave-request-dialog/leave-request-dialog.component';
 import { RequestStatus as LeaveRequestStatus } from '../../core/enums/enums';
-import { LookupsService } from '../../core/services/lookups/lookups.service';
 
 interface Day {
   date: number;
   isPast: boolean;
   selected: boolean;
   monthIndex: number;
-  absenceType?: LeaveType;
+  leaveType?: LeaveType;
   requestStatus?: RequestStatus;
   requestId?: number;
   isRangeStart?: boolean;
@@ -51,6 +50,7 @@ export class VacationScheduleComponent implements OnInit {
 
   currentUserId = signal<number | null>(null);
   showLeaveDialog = signal(false);
+  dialogError = signal<string | null>(null);
 
   leaveRequests$: Observable<LeaveRequest[]> = this.store.select(
     selectAllLeaveRequestsByUser
@@ -167,13 +167,25 @@ export class VacationScheduleComponent implements OnInit {
     const startDay = this.getFirstSelectedDay();
     const endDay = this.getLastSelectedDay();
 
-    if (!startDay || !endDay) return;
+    if (!startDay || !endDay) {
+      this.dialogError.set(
+        'Start date cannot be after end date. Please select valid range.'
+      );
+      return;
+    }
 
-    const overlap = this.hasOverlapWithExistingRequests(startDay, endDay);
+    const startDate = new Date(
+      this.currentYear,
+      startDay.monthIndex,
+      startDay.date
+    );
+    const endDate = new Date(this.currentYear, endDay.monthIndex, endDay.date);
+
+    const overlap = this.hasOverlapWithExistingRequests(startDate, endDate);
     if (overlap) {
-      alert('Selected range overlaps with existing leave requests.');
-      this.clearAllSelections(true);
-      this.firstSelectedDay = null;
+      this.dialogError.set(
+        'Selected range overlaps with existing leave requests.'
+      );
       return;
     }
 
@@ -193,10 +205,12 @@ export class VacationScheduleComponent implements OnInit {
       })
     );
 
+    this.dialogError.set(null);
     this.showLeaveDialog.set(false);
   }
 
   onLeaveDialogCancel() {
+    this.dialogError.set(null);
     this.showLeaveDialog.set(false);
     this.cancelSelection();
   }
@@ -238,7 +252,7 @@ export class VacationScheduleComponent implements OnInit {
           d.isRangeStart = false;
           d.isRangeEnd = false;
           d.isRangeMiddle = false;
-          d.absenceType = undefined;
+          d.leaveType = undefined;
         }
       })
     );
@@ -268,7 +282,7 @@ export class VacationScheduleComponent implements OnInit {
           const dayDate = new Date(this.currentYear, m, d.date);
 
           if (dayDate >= startDateOnly && dayDate <= endDateOnly) {
-            d.absenceType = req.leaveType;
+            d.leaveType = req.leaveType;
             d.requestStatus = req.requestStatus;
             d.requestId = req.requestId;
           }
@@ -277,14 +291,10 @@ export class VacationScheduleComponent implements OnInit {
     });
   }
 
-  private hasOverlapWithExistingRequests(startDay: Day, endDay: Day): boolean {
-    const startDate = new Date(
-      this.currentYear,
-      startDay.monthIndex,
-      startDay.date
-    );
-    const endDate = new Date(this.currentYear, endDay.monthIndex, endDay.date);
-
+  private hasOverlapWithExistingRequests(
+    startDate: Date,
+    endDate: Date
+  ): boolean {
     for (const month of this.months) {
       for (const d of month.days) {
         if (d.date === 0) continue;

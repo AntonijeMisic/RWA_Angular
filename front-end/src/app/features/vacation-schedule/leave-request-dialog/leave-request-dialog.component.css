@@ -41,17 +41,20 @@
   color: #333;
 }
 
-select, textarea {
+select,
+textarea {
   width: 100%;
   padding: 8px 10px;
-  border-radius: 6px;
+  border-radius: 2px;
   border: 1px solid #ccc;
   font-size: 14px;
-  resize: vertical;
+  font-family: inherit;
+  box-sizing: border-box;
 }
 
 textarea {
   min-height: 60px;
+  resize: vertical;
 }
 
 .dialog-actions {
@@ -91,4 +94,11 @@ button.confirm:hover {
 button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.error-message {
+  color: red;
+  font-size: 13px;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }

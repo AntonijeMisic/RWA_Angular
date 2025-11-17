@@ -169,6 +169,24 @@
 
 .attendance-table tbody tr {
   background-color: white;
+  height: 60px;
+}
+
+.attendance-table tbody td {
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attendance-table tbody td:last-child {
+  white-space: nowrap;
+}
+
+.attendance-table tbody td .btn {
+  display: inline-block;
+  max-height: 36px;
+  line-height: normal;
 }
 
 .attendance-table tbody tr:hover {
@@ -232,5 +250,3 @@
   color: var(--accent-dark);
   font-size: 15px;
 }
-
-
