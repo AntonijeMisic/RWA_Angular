@@ -1,12 +1,10 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { combineLatest, map, Observable } from 'rxjs';
 
-import {
-  LeaveRequest,
-} from '../../core/models/leaveRequest.model';
+import { LeaveRequest } from '../../core/models/leaveRequest.model';
 import { RequestStatus } from '../../core/models/lookups.model';
 import { LookupsService } from '../../core/services/lookups/lookups.service';
 import { FilterPipe } from './filter.pipe';
@@ -19,6 +17,7 @@ import {
 } from '../../store/leave-requests/leave-requests.actions';
 import { RequestStatus as LeaveRequestStatus } from '../../core/enums/enums';
 import { UpdateStatusDto } from '../../core/dtos/dtos';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-requests',
@@ -30,6 +29,7 @@ import { UpdateStatusDto } from '../../core/dtos/dtos';
 export class RequestsComponent implements OnInit {
   store = inject(Store);
   lookupService = inject(LookupsService);
+  destroyRef = inject(DestroyRef);
 
   leaveRequests$: Observable<LeaveRequest[]> = this.store.select(
     selectAllLeaveRequests
@@ -44,7 +44,10 @@ export class RequestsComponent implements OnInit {
   ngOnInit(): void {
     this.requestStatuses = this.lookupService.getLookups().requestStatuses;
     combineLatest([this.store.select(selectCurrentUser)])
-      .pipe(map(([user]) => user))
+      .pipe(
+        map(([user]) => user),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe((user) => {
         if (user) {
           this.currentUserId.set(user.userId);

@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import * as UsersActions from './users.actions';
 import { UserService } from '../../core/services/user/user.service';
-import { catchError, filter, map, mergeMap, switchMap, of } from 'rxjs';
+import { catchError, filter, map, mergeMap, switchMap, of, tap } from 'rxjs';
 
 @Injectable()
 export class UsersEffects {
@@ -13,12 +13,26 @@ export class UsersEffects {
     this.actions$.pipe(
       ofType(UsersActions.setCurrentUser),
       switchMap(({ userId }) =>
-        this.userService.getUserById(userId).pipe(
-          map((user) => UsersActions.setCurrentUserSuccess({ user })),
-          catchError((error) =>
-            of(UsersActions.setCurrentUserFailure({ error }))
-          )
-        )
+        userId != null
+          ? this.userService.getUserById(userId).pipe(
+              switchMap((user) =>
+                user
+                  ? of(UsersActions.setCurrentUserSuccess({ user }))
+                  : of(
+                      UsersActions.setCurrentUserFailure({
+                        error: 'User not found',
+                      })
+                    )
+              ),
+              catchError((error) =>
+                of(UsersActions.setCurrentUserFailure({ error }))
+              )
+            )
+          : of(
+              UsersActions.setCurrentUserFailure({
+                error: 'No userId provided',
+              })
+            )
       )
     )
   );
@@ -38,12 +52,27 @@ export class UsersEffects {
   loadUserById$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UsersActions.loadUserById),
-      filter((action) => action.userId != null),
       switchMap(({ userId }) =>
-        this.userService.getUserById(userId!).pipe(
-          map((user) => UsersActions.loadUserByIdSuccess({ user })),
-          catchError((error) => of(UsersActions.loadUserByIdFailure({ error })))
-        )
+        userId != null
+          ? this.userService.getUserById(userId).pipe(
+              switchMap((user) =>
+                user
+                  ? of(UsersActions.loadUserByIdSuccess({ user }))
+                  : of(
+                      UsersActions.loadUserByIdFailure({
+                        error: 'User not found',
+                      })
+                    )
+              ),
+              catchError((error) =>
+                of(UsersActions.loadUserByIdFailure({ error }))
+              )
+            )
+          : of(
+              UsersActions.loadUserByIdFailure({
+                error: 'No userId provided',
+              })
+            )
       )
     )
   );

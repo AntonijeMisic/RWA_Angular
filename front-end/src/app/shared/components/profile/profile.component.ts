@@ -55,7 +55,7 @@ export class ProfileComponent implements OnInit {
 
   isAdmin = signal(false);
   routeUserId = signal<number | null>(null);
-  isNewUser = computed(() => this.routeUserId() === null);
+  isNewUser = computed(() => this.routeUserId() === 0 || this.routeUserId() === null);
 
   constructor() {
     this.profileForm = new FormGroup<UserForm>({
@@ -87,42 +87,34 @@ export class ProfileComponent implements OnInit {
       }
     });
 
-    this.route.paramMap
-      .pipe(
-        map((paramMap) => paramMap.get('id')),
-        map((id) => (id ? Number(id) : null)),
-        switchMap((userId) => {
-          this.routeUserId.set(userId);
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.routeUserId.set(id);
+    console.log('Route user ID:', this.routeUserId());
 
-          if (this.isNewUser()) {
-            this.profileForm.reset();
-            this.profileForm.controls.password.setValidators(
-              Validators.required
-            );
-            this.profileForm.controls.password.updateValueAndValidity();
-            return of(null);
-          }
+    if (this.isNewUser()) {
+      this.profileForm.reset();
+      this.profileForm.controls.password.setValidators(Validators.required);
+      this.profileForm.controls.password.updateValueAndValidity();
+    } else {
+      this.store.dispatch(UsersActions.loadUserById({ userId: id }));
 
-          this.store.dispatch(UsersActions.loadUserById({ userId }));
-
-          return this.store
-            .select(selectSelectedUser)
-            .pipe(filter((user) => !!user && user.userId === userId));
-        })
-      )
-      .subscribe((user) => {
-        if (user) {
-          const { password, ...rest } = user;
-
-          this.profileForm.patchValue({
-            ...rest,
-            password: null,
-          });
-
+      this.store
+        .select(selectSelectedUser)
+        .pipe(filter((user) => !!user && user.userId === id))
+        .subscribe((user) => {
+          const { password, ...rest } = user!;
+          this.profileForm.patchValue({ ...rest, password: null });
           this.profileForm.controls.password.clearValidators();
           this.profileForm.controls.password.updateValueAndValidity();
-        }
-      });
+        });
+
+      this.store
+        .select((state) => state.users.error)
+        .pipe(filter(Boolean))
+        .subscribe(() => {
+          this.router.navigate(['/home/users']);
+        });
+    }
   }
 
   save() {

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import * as AnnouncementsActions from './announcements.actions';
-import { catchError, map, mergeMap, switchMap, of } from 'rxjs';
+import { catchError, map, mergeMap, of, exhaustMap } from 'rxjs';
 import { AnnouncementService } from '../../core/services/announcements/announcements.service';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class AnnouncementsEffects {
   load$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AnnouncementsActions.loadAnnouncements),
-      switchMap(() =>
+      exhaustMap(() =>
         this.announcementService.getAllAnnouncements().pipe(
           map((announcements) =>
             AnnouncementsActions.loadAnnouncementsSuccess({ announcements })
@@ -28,7 +28,7 @@ export class AnnouncementsEffects {
   loadAnnouncementById$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AnnouncementsActions.loadAnnouncementById),
-      switchMap(({ id }) =>
+      exhaustMap(({ id }) =>
         this.announcementService.getAnnouncementById(id).pipe(
           map((announcement) =>
             AnnouncementsActions.loadAnnouncementByIdSuccess({ announcement })

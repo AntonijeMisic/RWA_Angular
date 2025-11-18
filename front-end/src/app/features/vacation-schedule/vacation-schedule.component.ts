@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -15,6 +15,7 @@ import { selectAllLeaveRequestsByUser } from '../../store/leave-requests/leave-r
 import { selectCurrentUser } from '../../store/users/users.selectors';
 import { LeaveRequestDialogComponent } from './leave-request-dialog/leave-request-dialog.component';
 import { RequestStatus as LeaveRequestStatus } from '../../core/enums/enums';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface Day {
   date: number;
@@ -43,6 +44,7 @@ interface Month {
 })
 export class VacationScheduleComponent implements OnInit {
   store = inject(Store<AppState>);
+  destroyRef = inject(DestroyRef);
 
   currentYear = new Date().getFullYear();
   weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -62,7 +64,10 @@ export class VacationScheduleComponent implements OnInit {
     this.generateMonths();
 
     combineLatest([this.store.select(selectCurrentUser)])
-      .pipe(map(([user]) => user))
+      .pipe(
+        map(([user]) => user),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe((user) => {
         if (user) {
           this.currentUserId.set(user.userId);

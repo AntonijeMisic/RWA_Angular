@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -15,6 +15,7 @@ import { combineLatest, take } from 'rxjs';
 import { Announcement } from '../../../core/models/announcement.model';
 import { selectCurrentUser } from '../../../store/users/users.selectors';
 import { Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export interface AnnouncementForm {
   title: FormControl<string>;
@@ -34,6 +35,7 @@ export class AnnouncementComponent implements OnInit {
   store = inject(Store<AppState>);
   router = inject(Router);
   route = inject(ActivatedRoute);
+  destroyRef = inject(DestroyRef);
 
   isAdmin = signal(false);
   isLoading = signal(true);
@@ -57,7 +59,9 @@ export class AnnouncementComponent implements OnInit {
       this.store.select(selectCurrentUser),
       this.store.select((state) => state.announcements.selectedAnnouncement),
       this.store.select((state) => state.announcements.error),
-    ]).subscribe(([user, selected, error]) => {
+    ])
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe(([user, selected, error]) => {
       this.isAdmin.set(!!user && user.userRole?.roleName === 'Admin');
       if (!this.isAdmin()) {
         this.announcementForm.disable();
